@@ -23,4 +23,14 @@ interface IUniswapV3Factory {
         address tokenB,
         uint24 fee
     ) external view returns (address pool);
+
+    function createPool(
+        address tokenA,
+        address tokenB,
+        uint24 fee
+    ) external returns (address pool);
+
+    function setOwner(address _owner) external;
+
+    function enableFeeAmount(uint24 fee, int24 tickSpcing) external;
 }
