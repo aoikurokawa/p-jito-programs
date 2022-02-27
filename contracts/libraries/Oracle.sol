@@ -135,4 +135,39 @@ library Oraclee {
             else l = i + 1;
         }
     }
+
+    // Fetches the observations beforeOrAt and atOrAfter a given target, i.e. where [beforeOrAt, atOrAfter] is satisfied
+    function getSurroundingObservations(
+        Observation[65535] storage self,
+        uint32 time,
+        uint32 target,
+        int24 tick,
+        uint16 index,
+        uint128 liquidity,
+        uint16 cardinality
+    )
+        private
+        view
+        returns (Observation memory beforeOrAt, Observation memory atOrAfter)
+    {
+        beforeOrAt = self[index];
+
+        if (lte(time, beforeOrAt.blockTimestamp, target)) {
+            if (beforeOrAt.blockTimestamp == target) {
+                return (beforeOrAt, atOrAfter);
+            } else {
+                return (
+                    beforeOrAt,
+                    transform(beforeOrAt, target, tick, liquidity)
+                );
+            }
+        }
+
+        beforeOrAt = self[(index + 1) % cardinality];
+        if (!beforeOrAt.initialized) beforeOrAt = self[0];
+
+        require(lte(time, beforeOrAt.blockTimestamp, target), "OLD");
+
+        return binarySearch(self, time, target, index, cardinality);
+    }
 }
