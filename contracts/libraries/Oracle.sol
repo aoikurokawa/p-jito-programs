@@ -170,4 +170,82 @@ library Oraclee {
 
         return binarySearch(self, time, target, index, cardinality);
     }
+
+    /// Reverts if an observation at or before the desired observation timestamp does not exist. 
+    /// 0 may be passed as 'secondsAgo' to return the current cumulative values.
+    /// if called with a timestamp falling between two observation, returns the counterfactual accumulator values
+    /// at exactly the timestamp between the two observation
+    function observeSingle(
+        Observation[65535] storage self,
+        uint32 time,
+        uint32 secondsAgo,
+        int24 tick,
+        uint16 index,
+        uint128 liquidity,
+        uint16 cardinality
+    )
+        internal
+        view
+        returns (
+            int56 tickCumulative,
+            uint160 secondsPerLiquidityCumulativeX128
+        )
+    {
+        if (secondsAgo == 0) {
+            Observation memory last = self[index];
+            if (last.blockTimestamp != time)
+                last = transform(last, time, tick, liquidity);
+            return (
+                last.tickCumulative,
+                last.secondsPerLiquidityCumulativeX128
+            );
+        }
+
+        uint32 target = time - secondsAgo;
+
+        (
+            Observation memory beforeOrAt,
+            Observation memory atOrAfter
+        ) = getSurroundingObservations(
+                self,
+                time,
+                target,
+                tick,
+                index,
+                liquidity,
+                cardinality
+            );
+
+        if (target == beforeOrAt.blockTimestamp) {
+            return (
+                beforeOrAt.tickCumulative,
+                beforeOrAt.secondsPerLiquidityCumulativeX128
+            );
+        } else if (target == atOrAfter.blockTimestamp) {
+            return (
+                atOrAfter.tickCumulative,
+                atOrAfter.secondsPerLiquidityCumulativeX128
+            );
+        } else {
+            uint32 observationTimeDelta = atOrAfter.blockTimestamp -
+                beforeOrAt.blockTimestamp;
+            uint32 targetDelta = target - beforeOrAt.blockTimestamp;
+
+            return (
+                beforeOrAt.tickCumulative +
+                    ((atOrAfter.tickCumulative - beforeOrAt.tickCumulative) /
+                        observationTimeDelta) *
+                    targetDelta,
+                beforeOrAt.secondsPerLiquidityCumulativeX128 +
+                    uint160(
+                        (uint256(
+                            atOrAfter.secondsPerLiquidityCumulativeX128 -
+                                beforeOrAt.secondsPerLiquidityCumulativeX128
+                        ) * targetDelta) / observationTimeDelta
+                    )
+            );
+        }
+    }
+
+
 }
