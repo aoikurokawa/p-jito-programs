@@ -171,7 +171,7 @@ library Oraclee {
         return binarySearch(self, time, target, index, cardinality);
     }
 
-    /// Reverts if an observation at or before the desired observation timestamp does not exist. 
+    /// Reverts if an observation at or before the desired observation timestamp does not exist.
     /// 0 may be passed as 'secondsAgo' to return the current cumulative values.
     /// if called with a timestamp falling between two observation, returns the counterfactual accumulator values
     /// at exactly the timestamp between the two observation
@@ -247,5 +247,37 @@ library Oraclee {
         }
     }
 
+    // Returns the accumulator values as of each time seconds ago from the given time in the array of 'secondsAgos'
+    function obsserve(
+        Observation[65535] storage self,
+        uint32 time,
+        uint32[] memory secondsAgos,
+        int24 tick,
+        uint16 index,
+        uint128 liquidity,
+        uint16 cardinality
+    )
+        internal
+        view
+        returns (
+            int56[] memory tickCumulatives,
+            uint160[] memory secondsPerLiquidityCumulativeX128s
+        )
+    {
+        require(cardinality > 0, "I");
 
+        tickCumulatives = new int56[](secondsAgos.length);
+        secondsPerLiquidityCumulativeX128s = new uint160[](secondsAgos.length);
+        for (uint256 i = 0; i < secondsAgos.length, i++) {
+            (tickCumulatives[i], secondsPerLiquidityCumulativeX128s[i]) = obserbeSingle(
+                self, 
+                time, 
+                secondsAgos[i], 
+                tick,
+                index,
+                liquidity,
+                cardinality
+            );
+        }
+    }
 }
