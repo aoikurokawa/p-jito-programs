@@ -176,4 +176,72 @@ library SqrtPriceMath {
                 : FullMath.mulDiv(numerator1, numerator2, sqrtRatioBX96) /
                     sqrtRatioAX96;
     }
+
+    // Helper that gets signed token0 delta
+    function getAmount1Delta(
+        uint160 sqrtRatioAX96,
+        uint160 sqrtRatioBX96,
+        uint128 liquidity,
+        bool roundUp
+    ) internal pure returns (uint256 amount1) {
+        if (sqrtRatioAX96 > sqrtRatioBX96)
+            (sqrtRatioAX96, sqrtRatioBX96) = (sqrtRatioBX96, sqrtRatioAX96);
+
+        return
+            roundUp
+                ? FullMath.mulDivRoundingUp(
+                    liquidity,
+                    sqrtRatioBX96 - sqrtRatioAX96,
+                    FixedPoint96.Q96
+                )
+                : FullMath.mulDiv(
+                    liquidity,
+                    sqrtRatioBX96 - sqrtRatioAX96,
+                    FixedPoint96.Q96
+                );
+    }
+
+    // Helper that gets signed token0 delta
+    function getAmount0Delta(
+        uint160 sqrtRatioAX96,
+        uint160 sqrtRatioBX96,
+        int128 liquidity
+    ) internal pure returns (int256 amount0) {
+        return
+            liquidity < 0
+                ? -getAmount0Delta(
+                    sqrtRatioAX96,
+                    sqrtRatioBX96,
+                    uint128(-liquidity),
+                    false
+                ).toInt256()
+                : getAmount0Delta(
+                    sqrtRatioAX96,
+                    sqrtRatioBX96,
+                    uint128(liquidity),
+                    true
+                ).toInt256();
+    }
+
+    // Helper that gets signed token1 delta
+    function getAmount1Delta(
+        uint160 sqrtRatioAX96,
+        uint160 sqrtRatioBX96,
+        int128 liquidity
+    ) internal pure returns (int256 amount1) {
+        return
+            liquidity < 0
+                ? -getAmount1Delta(
+                    sqrtRatioAX96,
+                    sqrtRatioBX96,
+                    uint128(-liquidity),
+                    false
+                ).toInt256()
+                : getAmount1Delta(
+                    sqrtRatioAX96,
+                    sqrtRatioBX96,
+                    uint128(liquidity),
+                    true
+                ).toInt256();
+    }
 }
