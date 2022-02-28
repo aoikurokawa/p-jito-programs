@@ -122,6 +122,7 @@ library SqrtPriceMath {
                 );
     }
 
+    // Gets the next sqrt price given an output amount of token0 or token1
     function getNextSqrtPriceFromOutput(
         uint160 sqrtPX96,
         uint128 liquidity,
@@ -145,5 +146,34 @@ library SqrtPriceMath {
                     amountOut,
                     false
                 );
+    }
+
+    // Gets the amount0 delta between two prices
+    function getAmount0Delta(
+        uint160 sqrtRatioAX96,
+        uint160 sqrtRatioBX96,
+        uint128 liquidity,
+        bool roundUp
+    ) internal pure returns (uint256 amount0) {
+        if (sqrtRatioAX96 > sqrtRatioBX96)
+            (sqrtRatioAX96, sqrtRatioBX96) = (sqrtRatioBX96, sqrtRatioAX96);
+
+        uint256 numerator1 = uint256(liquidity) << FixedPoint96.RESOLUTION;
+        uint256 numerator2 = sqrtRatioBX96 - sqrtRatioAX96;
+
+        require(sqrtRatioAX96 > 0);
+
+        return
+            roundUp
+                ? UnsafeMath.divRoundingUp(
+                    FullMath.mulDivRoundingUp(
+                        numerator1,
+                        numerator2,
+                        sqrtRatioBX96
+                    ),
+                    sqrtRatioAX96
+                )
+                : FullMath.mulDiv(numerator1, numerator2, sqrtRatioBX96) /
+                    sqrtRatioAX96;
     }
 }
