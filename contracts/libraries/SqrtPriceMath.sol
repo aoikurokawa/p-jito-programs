@@ -95,4 +95,55 @@ library SqrtPriceMath {
             return uint160(sqrtPX96 - quotient);
         }
     }
+
+    // Gets the next sqrt price given an input amount of token0 or token1
+    function getNextSqrtPriceFromInput(
+        uint160 sqrtPX96,
+        uint128 liquidity,
+        uint256 amountIn,
+        bool zeroForOne
+    ) internal pure returns (uint160 sqrtQX96) {
+        require(sqrtPX96 > 0);
+        require(liquidity > 0);
+
+        return
+            zeroForOne
+                ? getNextSqrtPriceFromAmount0RoundingUp(
+                    sqrtPX96,
+                    liquidity,
+                    amountIn,
+                    true
+                )
+                : getNextSqrtPriceFromAmount1RoundingDown(
+                    sqrtPX96,
+                    liquidity,
+                    amountIn,
+                    true
+                );
+    }
+
+    function getNextSqrtPriceFromOutput(
+        uint160 sqrtPX96,
+        uint128 liquidity,
+        uint256 amountOut,
+        bool zeroForOne
+    ) internal pure returns (uint160 sqrtQX96) {
+        require(sqrtPX96 > 0);
+        require(liquidity > 0);
+
+        return
+            zeroForOne
+                ? getNextSqrtPriceFromAmount1RoundingDown(
+                    sqrtPX96,
+                    liquidity,
+                    amountOut,
+                    false
+                )
+                : getNextSqrtPriceFromAmount0RoundingUp(
+                    sqrtPX96,
+                    liquidity,
+                    amountOut,
+                    false
+                );
+    }
 }
