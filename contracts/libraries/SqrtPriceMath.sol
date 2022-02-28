@@ -29,7 +29,7 @@ library SqrtPriceMath {
                 uint256 denominator = numerator1 + product;
                 if (denominator >= numerator1) {
                     return
-                    // always fits in 160 bits
+                        // always fits in 160 bits
                         uint160(
                             FullMath.mulDivRoundingUp(
                                 numerator1,
@@ -60,6 +60,39 @@ library SqrtPriceMath {
                 FullMath
                     .mulDivRoundingUp(numerator1, sqrtPX96, denominator)
                     .toUint160();
+        }
+    }
+
+    // Gets the next sqrt price given a delta of token1
+    function getNextSqrtPriceFromAmount1RoundingDown(
+        uint160 sqrtPX96,
+        uint128 liquidity,
+        uint256 amount,
+        bool add
+    ) internal pure returns (uint160) {
+        if (add) {
+            uint256 quotient = (
+                amount <= type(uint160).max
+                    ? (amount << FixedPoint96.RESOLUTION) / liquidity
+                    : FullMath.mulDiv(amount, FixedPoint96.Q96, liquidity)
+            );
+            return uint256(sqrtPX96).add(quotient).toUint160();
+        } else {
+            uint256 quotient = (
+                amount <= type(uint160).max
+                    ? UnsafeMath.divRoundingUp(
+                        amount << FixedPoint96.RESOLUTION,
+                        liquidity
+                    )
+                    : FullMath.mulDivRoundingUp(
+                        amount,
+                        FixedPoint96.Q96,
+                        liquidity
+                    )
+            );
+            require(sqrtPX96 > quotient);
+
+            return uint160(sqrtPX96 - quotient);
         }
     }
 }
