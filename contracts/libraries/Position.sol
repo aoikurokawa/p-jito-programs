@@ -27,4 +27,52 @@ library Position {
             keccak256(abi.encodePacked(owner, tickLower, tickUpper))
         ];
     }
+
+    // Credits accumulated fees to a user's position
+    function update(
+        Info storage self,
+        int128 liquidityDelta,
+        uint256 feeGrowthInside0X128,
+        uint256 feeGrowthInside1X128
+    ) internal {
+        Info memory _self = self;
+
+        uint128 liquidityNext;
+        if (liquidityDelta == 0) {
+            require(_self.liquidity > 0, "NP");
+            liquidityNext = _self.liquidity;
+        } else {
+            liquidityNext = LiquidityMath.addDelta(
+                _self.liquidity,
+                uint128(liquidityDelta)
+            );
+        }
+
+        // calculate accumulated fees
+        uint128 tokensOwed0 = uint128(
+            FullMath.mulDiv(
+                feeGrowthInside0X128 - _self.feeGrowthInside0LastX128,
+                _self.liquidity,
+                FixedPoint128.Q128
+            )
+        );
+        uint128 tokensOwed1 = uint128(
+            FullMath.mulDiv(
+                feeGrowthInside1X128 - _self.feeGrowthInside1LastX128,
+                _self.liquidity,
+                FixedPoint128.Q128
+            )
+        );
+
+        // update the position
+        if (liquidityDelta != 0) self.liquidity = liquidityNext;
+        self.feeGrowthInside0LastX128 = feeGrowthInside0X128;
+        self.feeGrowthInside1LastX128 = feeGrowthInside1X128;
+
+        if (tokensOwed0 > 0 || tokensOwed1 > 0) {
+            // overflow is acceptable, have to withdraw before you hit type(uint128).max fees
+            self.tokensOwed0 += tokensOwed0;
+            self.tokensOwed1 += tokensOwed1;
+        }
+    }
 }
