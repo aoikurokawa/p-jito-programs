@@ -251,4 +251,43 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             );
         }
     }
+
+    // IUniswapV3poolDerivedState
+    function observe(uint32[] calldata secondsAgos)
+        external
+        view
+        override
+        noDelegateCall
+        returns (
+            int56[] memory tickCumulatives,
+            uint160[] memory secondsPerLiquidityCumulativeX128s
+        )
+    {
+        return
+            observations.observe(
+                _blockTimestam(),
+                secondsAgos,
+                slot0.tick,
+                slot0.observationIndex,
+                liquidity,
+                slot0.observationCardinality
+            );
+    }
+
+    // IUniswapV3PoolActions
+    function increaseObservationCardinalityNext(
+        uint16 observationCardinalityNext
+    ) external override lock noDelegateCall {
+        uint16 observationCardinalityNextOld = slot0.observationCardinalityNext;
+        uint16 observationCardinalityNextNew = observations.grow(
+            observationCardinalityNextOld,
+            observationCardinalityNext
+        );
+        slot0.observationCardinalityNext = observationCardinalityNextNew;
+        if (observationCardinalityNextOld != observationCardinalityNextNew)
+            emit IncreaseObservationCardinalityNext(
+                observationCardinalityNextOld,
+                observationCardinalityNextNew
+            );
+    }
 }
