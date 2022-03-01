@@ -76,4 +76,49 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
     }
 
     Slot0 public override slot0;
+
+    uint256 public override feeGrowthGlobal0X128;
+    uint256 public override feeGrowthGlobal1X128;
+
+    struct ProtocolFees {
+        uint128 token0;
+        uint128 token1;
+    }
+
+    ProtocolFees public override protocolFees;
+
+    uint128 public override liquidity;
+
+    mapping(int24 => Tick.Info) public override ticks;
+    mapping(int16 => uint256) public override tickBitmap;
+    mapping(bytes32 => Position.Info) public override positions;
+
+    Oracle.Observation[65535] public override observations;
+
+    // Mutually exclusive reentrancy protection into the pool to/from a method. This method also prevents entrance
+    // to a fucntion before the pool is initialized. The reentrancy guard is required throughout the contract because
+    // we use balance checks to determine the payment status of interactions such as mint, swap and flash.
+    modifier lock() {
+        require(slot0.unlocked, "LOK");
+        slot0.unlocked = false;
+        _;
+        slot0.unlocked = true;
+    }
+
+    modifier onlyFactoryOwner() {
+        require(msg.sender == IUniswapV3Factory(factory).owner());
+        _;
+    }
+
+    constructor() {
+        int24 _tickSpacing;
+        (factory, token0, token1, fee, _tickSpacing) = IUniswapV3PoolDeployer(
+            msg.sender
+        ).parameters();
+        tickSpacing = _tickSpacing;
+
+        maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(
+            _tickSpacing
+        );
+    }
 }
