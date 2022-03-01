@@ -121,4 +121,29 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
             _tickSpacing
         );
     }
+
+    // Common checks for valid tick inputs.
+    function checkTicks(int24 tickLower, int24 tickUpper) private pure {
+        require(tickLower < tickUpper, "TLU");
+        require(tickLower >= TickMath.MIN_TICK, "TLM");
+        require(tickUpper <= TickMath.MAX_TICK, "TUM");
+    }
+
+    // Returns the block timestamp truncated to 32 bits. i.e. mod 2**32. This method is overridden in tests.
+    function _blockTimestamp() internal view virtual returns (uint32) {
+        return uint32(block.timestamp);
+    }
+
+    // Get the pool's balance of token0
+    // This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize
+    function balance0() private view returns (uint256) {
+        (bool success, bytes memory data) = token0.staticcall(
+            abi.encodeWithSelector(
+                IERC20Minimal.balanceOf.selector,
+                address(this)
+            )
+        );
+        require(success && data.length >= 32);
+        return abi.decode(data, (uint256));
+    }
 }
