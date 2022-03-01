@@ -146,4 +146,109 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         require(success && data.length >= 32);
         return abi.decode(data, (uint256));
     }
+
+    // Get the pool's balance of token0
+    // This function is gas optimized to avoid a redundant extcodesize check in addition to the returndatasize
+    function balance1() private view returns (uint256) {
+        (bool success, bytes memory data) = token1.staticcall(
+            abi.encodeWithSelector(
+                IERC20Minimal.balanceOf.selector,
+                address(this)
+            )
+        );
+        require(success && data.length >= 32);
+        return abi.decode(data, (uint256));
+    }
+
+    // IUniswapV3PoolDerivedState
+    function snapshotCumulativeInside(int24 tickLower, int24 tickUpper)
+        external
+        view
+        override
+        noDelegateCall
+        returns (
+            int56 tickCumulative,
+            uint160 secondsPerLiquidityInsideX128,
+            uint32 secondsInside
+        )
+    {
+        checkTicks(tickLower, tickUpper);
+
+        int56 tickCumulativeLower;
+        int56 tickCumulativeUpper;
+        uint160 secondsPerLiquidityOutsideLowerX128;
+        uint160 secondsPerLiquidityOutsideUpperX128;
+        uint32 secondsOutsideLower;
+        uint32 secondsOutsideUpper;
+
+        {
+            Tick.Info storage lower = ticks[tickLower];
+            Tick.Info storage upper = ticks[tickUpper];
+            bool initialzedLower;
+            (
+                tickCumulativeLower,
+                secondsPerLiquidityOutsideLowerX128,
+                secondsOutsideLower,
+                initialzedLower
+            ) = (
+                lower.tickCumulativeOutside,
+                lower.secondsPerLiquidityOutsideX128,
+                lower.secondsOutside,
+                lower.initialized
+            );
+            require(initialzedLower);
+
+            bool initializedUpper;
+            (
+                tickCumulativeUpper,
+                secondsPerLiquidityOutsideUpperX128,
+                secondsOutsideUpper,
+                initializedUpper
+            ) = (
+                upper.tickCumulativeOutside,
+                upper.secondsPerLiquidityOutsideX128,
+                upper.secondsOutside,
+                upper.initialized
+            );
+            require(initializedUpper);
+        }
+
+        Slot0 memory _slot0 = slot0;
+
+        if (_slot0.tick < tickLower) {
+            return (
+                tickCumulativeLower - tickCumulativeUpper,
+                secondsPerLiquidityOutsideLowerX128 -
+                    secondsPerLiquidityOutsideUpperX128,
+                secondsOutsideLower - secondsOutsideUpper
+            );
+        } else if (_slot0.tick < tickUpper) {
+            uint32 time = _blockTimestamp();
+            (
+                int56 tickCumulative,
+                uint160 secondsPerLiquidityCumulativeX128
+            ) = observations.observeSingle(
+                    time,
+                    0,
+                    _slot0.tick,
+                    _slot0.observationIndex,
+                    liquidity,
+                    _slot0.observationCardinality
+                );
+            return (
+                tickCumulative - tickCumulativeLower - tickCumulativeUpper,
+                secondsPerLiquidityCumulativeX128 -
+                    secondsPerLiquidityOutsideLowerX128 -
+                    secondsPerLiquidityOutsideUpperX128,
+                time - secondsOutsideLower - secondsOutsideUpper
+            );
+        } else {
+            return (
+                tickCumulativeUpper - tickCumulativeLower,
+                secondsPerLiquidtyOutsideUpperX128 -
+                    secondsPerLiquidityOutsideLowerX128,
+                secondsOutsideUpper - secondsOutsideLower
+            );
+        }
+    }
 }
