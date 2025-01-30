@@ -30,9 +30,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rpc_client = RpcClient::new(args.rpc_url.clone());
     info!("started rpc client at {}", args.rpc_url);
 
-    let state = Arc::new(jito_restaking_api::router::RouterState { rpc_client });
+    let state = Arc::new(restaking_scan::router::RouterState { rpc_client });
 
-    let app = jito_restaking_api::router::get_routes(state);
+    let app = restaking_scan::router::get_routes(state);
 
     axum::Server::bind(&args.bind_addr)
         .serve(app.into_make_service_with_connect_info::<SocketAddr>())
