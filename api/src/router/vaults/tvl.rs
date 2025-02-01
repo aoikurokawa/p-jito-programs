@@ -4,12 +4,13 @@ use std::{
     sync::Arc,
 };
 
-use anchor_lang::{prelude::Pubkey, AnchorDeserialize};
+use anchor_lang::prelude::Pubkey;
 use axum::{
     extract::{Path, State},
     response::IntoResponse,
     Json,
 };
+use borsh::BorshDeserialize;
 use jito_bytemuck::Discriminator;
 use jito_vault_client::{accounts::Vault, programs::JITO_VAULT_ID};
 use solana_account_decoder::UiAccountEncoding;
@@ -18,7 +19,7 @@ use solana_rpc_client_api::{
     filter::{Memcmp, MemcmpEncodedBytes, RpcFilterType},
 };
 
-use crate::{error::JitoRestakingApiError, router::RouterState};
+use crate::{error::JitoRestakingApiError, router::RouterState, state::metadata::Metadata};
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Tvl {
@@ -52,7 +53,7 @@ struct CoinResponse {
 }
 
 pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<impl IntoResponse> {
-    let accounts = state
+    let vault_accounts = state
         .rpc_client
         .get_program_accounts_with_config(
             &JITO_VAULT_ID,
@@ -72,7 +73,48 @@ pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<im
         )
         .await?;
 
-    let st_pubkeys: HashSet<String> = accounts
+    let mut vrt_pubkeys = Vec::new();
+    let metadata_program = Pubkey::from_str("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s").unwrap();
+    let vrt_metadata_pubkeys: Vec<Pubkey> = vault_accounts
+        .iter()
+        .map(|(_, vault)| {
+            let vault = Vault::deserialize(&mut vault.data.as_slice()).unwrap();
+            vrt_pubkeys.push(vault.vrt_mint);
+            Pubkey::find_program_address(
+                &[
+                    "metadata".as_bytes(),
+                    metadata_program.as_ref(),
+                    vault.vrt_mint.as_ref(),
+                ],
+                &metadata_program,
+            )
+            .0
+        })
+        .collect();
+
+    let vrt_metadata_accs = state
+        .rpc_client
+        .get_multiple_accounts(&vrt_metadata_pubkeys)
+        .await
+        .unwrap();
+
+    let metadatas: HashMap<Pubkey, Metadata> = vrt_metadata_accs
+        .iter()
+        .enumerate()
+        .filter_map(|(index, metadata_acc)| {
+            if let Some(acc) = metadata_acc {
+                if let Ok(data_v2) = Metadata::deserialize(&mut acc.data.as_slice()) {
+                    if let Some(vrt_pubkey) = vrt_pubkeys.get(index) {
+                        return Some((*vrt_pubkey, data_v2));
+                    }
+                }
+            }
+
+            None
+        })
+        .collect();
+
+    let st_pubkeys: HashSet<String> = vault_accounts
         .iter()
         .map(|(_, vault)| {
             let vault = Vault::deserialize(&mut vault.data.as_slice()).unwrap();
@@ -87,7 +129,7 @@ pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<im
     let response: CoinResponse = reqwest::get(url).await.unwrap().json().await.unwrap();
 
     let mut tvls = Vec::new();
-    for (vault_pubkey, vault) in accounts {
+    for (vault_pubkey, vault) in vault_accounts {
         let vault = Vault::deserialize(&mut vault.data.as_slice()).unwrap();
 
         let key = format!("solana:{}", vault.supported_mint);
@@ -105,13 +147,21 @@ pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<im
 
         let decimal_factor = 10u64.pow(decimals as u32) as f64;
         let native_unit_tvl = vault.tokens_deposited as f64 / decimal_factor;
-        tvls.push(Tvl {
-            vault_pubkey: vault_pubkey.to_string(),
-            supported_mint: vault.supported_mint.to_string(),
+        let (symbol, url) = match metadatas.get(&vault.vrt_mint) {
+            Some(metadata) => metadata.fetch_inner_metadata().await,
+            None => ("".to_string(), "".to_string()),
+        };
+
+        tvls.push(crate::state::tvl::Tvl::new(
+            vault_pubkey.to_string(),
+            vault.supported_mint.to_string(),
+            native_unit_symbol.to_string(),
             native_unit_tvl,
-            native_unit_symbol: native_unit_symbol.to_string(),
-            usd_tvl: native_unit_tvl * price_usd,
-        });
+            vault.vrt_mint.to_string(),
+            &symbol,
+            &url,
+            native_unit_tvl * price_usd,
+        ));
     }
 
     tvls.sort_by(|a, b| b.usd_tvl.total_cmp(&a.usd_tvl));

@@ -10,11 +10,13 @@ path = "src/bin/main.rs"
 [dependencies]
 anchor-lang = { workspace = true }
 axum = { workspace = true }
+borsh = { workspace = true }
 clap = { workspace = true }
 http = { workspace = true }
 jito-bytemuck = { workspace = true }
 jito-vault-client = { workspace = true, features = ["serde"] }
 jito-vault-core = { workspace = true }
+mpl-token-metadata = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
