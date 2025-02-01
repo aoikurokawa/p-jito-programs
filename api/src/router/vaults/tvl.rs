@@ -19,21 +19,7 @@ use solana_rpc_client_api::{
     filter::{Memcmp, MemcmpEncodedBytes, RpcFilterType},
 };
 
-use crate::{error::JitoRestakingApiError, router::RouterState};
-
-#[derive(Clone, BorshDeserialize, Debug, PartialEq, Eq)]
-pub struct Metadata {
-    pub key: u8,
-    pub update_authority: Pubkey,
-    pub mint: Pubkey,
-    pub name: String,
-    pub symbol: String,
-    pub uri: String,
-    pub seller_fee_basis_points: u16,
-    pub creators: Option<Vec<u8>>,
-    pub primary_sale_happened: bool,
-    pub is_mutable: bool,
-}
+use crate::{error::JitoRestakingApiError, router::RouterState, state::metadata::Metadata};
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Tvl {
@@ -112,8 +98,6 @@ pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<im
         .await
         .unwrap();
 
-    println!("{:?}", vrt_metadata_accs);
-
     let metadatas: HashMap<Pubkey, Metadata> = vrt_metadata_accs
         .iter()
         .enumerate()
@@ -165,17 +149,7 @@ pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<im
         let decimal_factor = 10u64.pow(decimals as u32) as f64;
         let native_unit_tvl = vault.tokens_deposited as f64 / decimal_factor;
         let (symbol, url) = match metadatas.get(&vault.vrt_mint) {
-            Some(metadata) => match http::Uri::from_str(&metadata.uri) {
-                Ok(uri) => {
-                    let inner_metadata: serde_json::Value =
-                        reqwest::get(uri.to_string()).await?.json().await?;
-                    (
-                        inner_metadata["symbol"].to_string(),
-                        inner_metadata["image"].to_string(),
-                    )
-                }
-                Err(_e) => ("".to_string(), "".to_string()),
-            },
+            Some(metadata) => metadata.fetch_inner_metadata().await,
             None => ("".to_string(), "".to_string()),
         };
 
