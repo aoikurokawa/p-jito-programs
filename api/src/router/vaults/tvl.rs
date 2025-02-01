@@ -103,7 +103,6 @@ pub async fn get_tvls(State(state): State<Arc<RouterState>>) -> crate::Result<im
         .enumerate()
         .filter_map(|(index, metadata_acc)| {
             if let Some(acc) = metadata_acc {
-                // let mut slice = &acc.data.as_slice();
                 if let Ok(data_v2) = Metadata::deserialize(&mut acc.data.as_slice()) {
                     if let Some(vrt_pubkey) = vrt_pubkeys.get(index) {
                         return Some((*vrt_pubkey, data_v2));
