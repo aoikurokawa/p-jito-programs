@@ -1,0 +1,10 @@
+[package]
+name = "jito-tip-payment-program"
+version = "0.0.1"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[dependencies]
+pinocchio.workspace = true
+pinocchio-system = { workspace = true }
