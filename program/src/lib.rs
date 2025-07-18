@@ -1,10 +1,8 @@
 #![no_std]
 
-extern crate pinocchio;
-extern crate pinocchio_system;
-
 use core::convert::{TryFrom, TryInto};
 
+use jito_tip_payment_sdk::error::TipPaymentError;
 use pinocchio::{
     account_info::AccountInfo,
     entrypoint,
@@ -24,6 +22,48 @@ pub const ID: Pubkey = [
     0x0f, 0x1e, 0x6b, 0x14, 0x21, 0xc0, 0x4a, 0x07, 0x04, 0x31, 0x26, 0x5c, 0x19, 0xc5, 0xbb, 0xee,
     0x19, 0x92, 0xba, 0xe8, 0xaf, 0xd1, 0xcd, 0x07, 0x8e, 0xf8, 0xaf, 0x70, 0x47, 0xdc, 0x11, 0xf7,
 ];
+
+/// We've decided to hardcode the seeds, effectively meaning the following PDAs owned by this program are singleton.
+///
+/// This ensures that `initialize` can only be invoked once,
+/// otherwise the tx would fail since the accounts would have
+/// already been initialized on subsequent calls.
+pub const CONFIG_ACCOUNT_SEED: &[u8] = b"CONFIG_ACCOUNT";
+pub const TIP_ACCOUNT_SEED_0: &[u8] = b"TIP_ACCOUNT_0";
+pub const TIP_ACCOUNT_SEED_1: &[u8] = b"TIP_ACCOUNT_1";
+pub const TIP_ACCOUNT_SEED_2: &[u8] = b"TIP_ACCOUNT_2";
+pub const TIP_ACCOUNT_SEED_3: &[u8] = b"TIP_ACCOUNT_3";
+pub const TIP_ACCOUNT_SEED_4: &[u8] = b"TIP_ACCOUNT_4";
+pub const TIP_ACCOUNT_SEED_5: &[u8] = b"TIP_ACCOUNT_5";
+pub const TIP_ACCOUNT_SEED_6: &[u8] = b"TIP_ACCOUNT_6";
+pub const TIP_ACCOUNT_SEED_7: &[u8] = b"TIP_ACCOUNT_7";
+
+struct Fees {
+    block_builder_fee_lamports: u64,
+    tip_receiver_fee_lamports: u64,
+}
+
+impl Fees {
+    fn calculate(
+        total_tips: u64,
+        block_builder_commission_pct: u64,
+    ) -> Result<Self, TipPaymentError> {
+        let block_builder_fee_lamports = total_tips
+            .checked_mul(block_builder_commission_pct)
+            .ok_or(TipPaymentError::ArithmeticError)?
+            .checked_div(100)
+            .ok_or(TipPaymentError::ArithmeticError)?;
+
+        let tip_receiver_fee_lamports = total_tips
+            .checked_sub(block_builder_fee_lamports)
+            .ok_or(TipPaymentError::ArithmeticError)?;
+
+        Ok(Self {
+            block_builder_fee_lamports,
+            tip_receiver_fee_lamports,
+        })
+    }
+}
 
 fn process_instruction(
     _program_id: &Pubkey,

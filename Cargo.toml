@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "program",
+    "program", "sdk",
 ]
 resolver = "2"
 
@@ -10,5 +10,7 @@ edition = "2021"
 readme = "README.md"
 
 [workspace.dependencies]
+jito-tip-payment-sdk = { path = "./sdk" }
 pinocchio = { version = "0.8.4" }
 pinocchio-system = "0.2.3"
+thiserror = "2.0.12"
