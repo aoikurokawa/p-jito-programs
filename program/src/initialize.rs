@@ -5,7 +5,6 @@ use jito_tip_payment_core::{
 use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
-    msg,
     program_error::ProgramError,
     pubkey::{find_program_address, Pubkey},
     sysvars::{rent::Rent, Sysvar},
@@ -158,9 +157,8 @@ impl<'a> Initialize<'a> {
         let required_lamports = rent.minimum_balance(space);
 
         let (_config_pubkey, config_bump) =
-            find_program_address(&[CONFIG_ACCOUNT_SEED], &self.program_id);
+            find_program_address(&[CONFIG_ACCOUNT_SEED], self.program_id);
 
-        msg!("Before creating config account");
         let bindings = [config_bump];
         let seeds = [Seed::from(CONFIG_ACCOUNT_SEED), Seed::from(&bindings)];
         let signers = [Signer::from(&seeds)];
@@ -172,7 +170,6 @@ impl<'a> Initialize<'a> {
             owner: self.program_id,
         }
         .invoke_signed(&signers)?;
-        msg!("After creating config account");
 
         let config = unsafe {
             load_mut_unchecked::<Config>(self.accounts.config.borrow_mut_data_unchecked())?
@@ -180,23 +177,23 @@ impl<'a> Initialize<'a> {
         config.tip_receiver = *self.accounts.payer.key();
         config.block_builder = *self.accounts.payer.key();
 
-        let mut bumps = InitBumps::default();
-        bumps.config = config_bump;
+        let mut bumps = InitBumps {
+            config: config_bump,
+            ..Default::default()
+        };
 
-        msg!("Before creating tip payment account 0 account");
         bumps.tip_payment_account_0 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_0,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_0,
             self.accounts.payer,
             self.accounts.system_program,
             &rent,
         )?;
-        msg!("After creating tip payment account 0 account");
 
         bumps.tip_payment_account_1 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_1,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_1,
             self.accounts.payer,
             self.accounts.system_program,
@@ -205,7 +202,7 @@ impl<'a> Initialize<'a> {
 
         bumps.tip_payment_account_2 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_2,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_2,
             self.accounts.payer,
             self.accounts.system_program,
@@ -214,7 +211,7 @@ impl<'a> Initialize<'a> {
 
         bumps.tip_payment_account_3 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_3,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_3,
             self.accounts.payer,
             self.accounts.system_program,
@@ -223,7 +220,7 @@ impl<'a> Initialize<'a> {
 
         bumps.tip_payment_account_4 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_4,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_4,
             self.accounts.payer,
             self.accounts.system_program,
@@ -232,7 +229,7 @@ impl<'a> Initialize<'a> {
 
         bumps.tip_payment_account_5 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_5,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_5,
             self.accounts.payer,
             self.accounts.system_program,
@@ -241,7 +238,7 @@ impl<'a> Initialize<'a> {
 
         bumps.tip_payment_account_6 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_6,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_6,
             self.accounts.payer,
             self.accounts.system_program,
@@ -250,7 +247,7 @@ impl<'a> Initialize<'a> {
 
         bumps.tip_payment_account_7 = TipPaymentAccount::initialize(
             TIP_ACCOUNT_SEED_7,
-            &self.program_id,
+            self.program_id,
             self.accounts.tip_payment_account_7,
             self.accounts.payer,
             self.accounts.system_program,

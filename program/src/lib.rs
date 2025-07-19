@@ -1,14 +1,13 @@
 #![no_std]
 
-use core::convert::{TryFrom, TryInto};
+use core::convert::TryFrom;
 
 use initialize::Initialize;
-use jito_tip_payment_sdk::error::TipPaymentError;
 use pinocchio::{
     account_info::AccountInfo,
     entrypoint,
     instruction::{Seed, Signer},
-    msg, nostd_panic_handler,
+    msg,
     program_error::ProgramError,
     pubkey::{find_program_address, Pubkey},
     ProgramResult,
