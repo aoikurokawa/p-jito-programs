@@ -5,4 +5,8 @@ edition = { workspace = true }
 
 [dependencies]
 pinocchio = { workspace = true }
+shank = { workspace = true }
+solana-instruction = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-system-interface = { workspace = true }
 thiserror = { workspace = true }

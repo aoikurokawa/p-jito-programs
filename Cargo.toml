@@ -1,6 +1,8 @@
 [workspace]
 members = [
-    "program", "sdk",
+    "core",
+    "program",
+    "sdk",
 ]
 resolver = "2"
 
@@ -10,7 +12,18 @@ edition = "2021"
 readme = "README.md"
 
 [workspace.dependencies]
-jito-tip-payment-sdk = { path = "./sdk" }
+jito-tip-payment-core = { path = "./core", version = "=0.0.1" }
+jito-tip-payment-sdk = { path = "./sdk", version = "=0.0.1" }
+litesvm = "0.6.1"
 pinocchio = { version = "0.8.4" }
+pinocchio-pubkey = "0.2.3"
 pinocchio-system = "0.2.3"
+shank = { version = "0.4.3-alpha.1", features = ["pinocchio"] }
+solana-keypair = "2.2.0"
+solana-instruction = "2.2.0"
+solana-pubkey = "2.2.0"
+solana-signer = "2.2.0"
+solana-system-interface = "1.0"
+solana-transaction = "2.2.0"
+test-log = "0.2.17"
 thiserror = "2.0.12"

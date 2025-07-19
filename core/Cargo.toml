@@ -1,0 +1,9 @@
+[package]
+name = "jito-tip-payment-core"
+version = "0.0.1"
+edition = { workspace = true }
+
+[dependencies]
+jito-tip-payment-sdk = { workspace = true }
+pinocchio = { workspace = true }
+pinocchio-system = { workspace = true }

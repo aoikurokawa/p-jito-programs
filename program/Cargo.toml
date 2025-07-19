@@ -7,6 +7,17 @@ edition = { workspace = true }
 crate-type = ["lib", "cdylib"]
 
 [dependencies]
+jito-tip-payment-core = { workspace = true }
 jito-tip-payment-sdk = { workspace = true }
 pinocchio = { workspace = true }
+pinocchio-pubkey = { workspace = true }
 pinocchio-system = { workspace = true }
+
+[dev-dependencies]
+litesvm = { workspace = true }
+solana-keypair = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-signer = { workspace = true }
+solana-transaction = { workspace = true }
+test-log = { workspace = true }
+thiserror = { workspace = true }
