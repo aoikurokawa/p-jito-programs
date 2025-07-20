@@ -10,7 +10,9 @@ use pinocchio_system::instructions::CreateAccount;
 
 #[derive(Debug, Default, Clone)]
 #[repr(C)]
-pub struct TipPaymentAccount {}
+pub struct TipPaymentAccount {
+    sample: u8,
+}
 
 impl TipPaymentAccount {
     pub const SIZE: usize = 8;

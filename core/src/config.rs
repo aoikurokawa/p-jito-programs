@@ -1,9 +1,10 @@
 use pinocchio::pubkey::Pubkey;
+use shank::ShankAccount;
 
 use crate::{init_bumps::InitBumps, Transmutable};
 
 /// Stores program config metadata.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, ShankAccount)]
 #[repr(C)]
 pub struct Config {
     /// The account claiming tips from the mev_payment accounts.

@@ -7,3 +7,4 @@ edition = { workspace = true }
 jito-tip-payment-sdk = { workspace = true }
 pinocchio = { workspace = true }
 pinocchio-system = { workspace = true }
+shank = { workspace = true }

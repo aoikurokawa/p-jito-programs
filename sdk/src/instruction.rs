@@ -4,9 +4,32 @@ use shank::ShankInstruction;
 #[derive(Clone, Debug, PartialEq, ShankInstruction)]
 pub enum JitoTipPaymentInstruction {
     /// Initialize
+    #[account(0, writable, name = "config")]
+    #[account(1, writable, name = "tip_payment_account_0")]
+    #[account(2, writable, name = "tip_payment_account_1")]
+    #[account(3, writable, name = "tip_payment_account_2")]
+    #[account(4, writable, name = "tip_payment_account_3")]
+    #[account(5, writable, name = "tip_payment_account_4")]
+    #[account(6, writable, name = "tip_payment_account_5")]
+    #[account(7, writable, name = "tip_payment_account_6")]
+    #[account(8, writable, name = "tip_payment_account_7")]
+    #[account(9, writable, signer, name = "payer")]
     Initialize,
 
     /// Change tip receiver
+    #[account(0, writable, name = "config")]
+    #[account(1, writable, name = "old_tip_receiver")]
+    #[account(2, writable, name = "new_tip_receiver")]
+    #[account(3, writable, name = "block_builder")]
+    #[account(4, writable, name = "tip_payment_account_0")]
+    #[account(5, writable, name = "tip_payment_account_1")]
+    #[account(6, writable, name = "tip_payment_account_2")]
+    #[account(7, writable, name = "tip_payment_account_3")]
+    #[account(8, writable, name = "tip_payment_account_4")]
+    #[account(9, writable, name = "tip_payment_account_5")]
+    #[account(10, writable, name = "tip_payment_account_6")]
+    #[account(11, writable, name = "tip_payment_account_7")]
+    #[account(12, writable, signer, name = "signer")]
     ChangeTipReceiver,
 
     /// Change block builder
