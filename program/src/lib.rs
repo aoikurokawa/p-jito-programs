@@ -3,9 +3,9 @@
 use core::convert::TryFrom;
 
 use change_tip_receiver::ChangeTipReceiver;
-use initialize::Initialize;
+use initialize::process_initialize;
 use jito_tip_payment_core::{fees::Fees, tip_payment_account::TipPaymentAccount};
-use jito_tip_payment_sdk::error::TipPaymentError;
+use jito_tip_payment_sdk::{error::TipPaymentError, instruction::JitoTipPaymentInstruction};
 use pinocchio::{
     account_info::AccountInfo, entrypoint, msg, program_error::ProgramError, pubkey::Pubkey,
     sysvars::rent::Rent, ProgramResult,
@@ -48,15 +48,25 @@ fn process_instruction(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    match instruction_data.split_first() {
-        Some((Initialize::DISCRIMINATOR, data)) => {
+    if *program_id != id() {
+        return Err(ProgramError::IncorrectProgramId);
+    }
+
+    let instruction = JitoTipPaymentInstruction::try_from_slice(instruction_data)?;
+
+    match instruction {
+        JitoTipPaymentInstruction::Initialize => {
             msg!("Instruction: InitializeConfig");
-            Initialize::try_from((program_id, data, accounts))?.process()
+            process_initialize(program_id, accounts)
         }
-        Some((ChangeTipReceiver::DISCRIMINATOR, _data)) => {
+        JitoTipPaymentInstruction::ChangeTipReceiver => {
+            msg!("Instruction: ChangeTipReceiver");
             ChangeTipReceiver::try_from(accounts)?.process()
         }
-        _ => Err(ProgramError::InvalidInstructionData),
+        JitoTipPaymentInstruction::ChangeBlockBuilder => {
+            msg!("Instruction: ChangeBlockBuilder");
+            ChangeTipReceiver::try_from(accounts)?.process()
+        }
     }
 }
 

@@ -1,3 +1,4 @@
+use pinocchio::program_error::ProgramError;
 use shank::ShankInstruction;
 
 #[repr(C)]
@@ -34,4 +35,35 @@ pub enum JitoTipPaymentInstruction {
 
     /// Change block builder
     ChangeBlockBuilder,
+}
+
+impl JitoTipPaymentInstruction {
+    pub fn try_from_slice(instruction_data: &[u8]) -> Result<Self, ProgramError> {
+        let [discriminator0, discriminator1, discriminator2, discriminator3, discriminator4, discriminator5, discriminator6, discriminator7] =
+            instruction_data
+        else {
+            return Err(ProgramError::InvalidInstructionData);
+        };
+
+        match [
+            discriminator0,
+            discriminator1,
+            discriminator2,
+            discriminator3,
+            discriminator4,
+            discriminator5,
+            discriminator6,
+            discriminator7,
+        ] {
+            // Initialize
+            [175, 175, 109, 31, 13, 152, 155, 237] => Ok(Self::Initialize),
+
+            // ChangeTipReceiver
+            [69, 99, 22, 71, 11, 231, 86, 143] => Ok(Self::ChangeTipReceiver),
+
+            // ChangeBlockBuilder
+            [134, 80, 38, 137, 165, 21, 114, 123] => Ok(Self::ChangeBlockBuilder),
+            _ => Err(ProgramError::InvalidInstructionData),
+        }
+    }
 }
