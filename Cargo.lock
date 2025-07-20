@@ -1482,6 +1482,7 @@ dependencies = [
  "pinocchio-system",
  "solana-keypair",
  "solana-pubkey",
+ "solana-sdk-ids",
  "solana-signer",
  "solana-transaction",
  "test-log",

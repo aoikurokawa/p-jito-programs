@@ -74,7 +74,7 @@ impl TipPaymentAccount {
 
     /// Drains the tip accounts, leaves enough lamports for rent exemption.
     #[inline(always)]
-    fn drain_accounts(rent: &Rent, accounts: &[AccountInfo]) -> Result<u64, ProgramError> {
+    pub fn drain_accounts(rent: &Rent, accounts: &[&AccountInfo]) -> Result<u64, ProgramError> {
         let mut total_tips: u64 = 0;
         for a in accounts {
             total_tips = total_tips

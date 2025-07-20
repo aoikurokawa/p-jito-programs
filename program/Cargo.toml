@@ -12,6 +12,7 @@ jito-tip-payment-sdk = { workspace = true }
 pinocchio = { workspace = true }
 pinocchio-pubkey = { workspace = true }
 pinocchio-system = { workspace = true }
+solana-sdk-ids = { workspace = true }
 
 [dev-dependencies]
 litesvm = { workspace = true }
