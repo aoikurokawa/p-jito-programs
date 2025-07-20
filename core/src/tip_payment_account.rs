@@ -7,11 +7,12 @@ use pinocchio::{
     sysvars::rent::Rent,
 };
 use pinocchio_system::instructions::CreateAccount;
-use shank::ShankAccount;
 
-#[derive(Debug, Default, Clone, ShankAccount)]
+#[derive(Debug, Default, Clone)]
 #[repr(C)]
-pub struct TipPaymentAccount {}
+pub struct TipPaymentAccount {
+    sample: u8,
+}
 
 impl TipPaymentAccount {
     pub const SIZE: usize = 8;

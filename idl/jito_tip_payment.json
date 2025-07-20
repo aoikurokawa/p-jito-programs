@@ -1,0 +1,262 @@
+{
+  "version": "0.0.1",
+  "name": "jito_tip_payment",
+  "instructions": [
+    {
+      "name": "Initialize",
+      "accounts": [
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount1",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount2",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount4",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount5",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount6",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount7",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 0
+      }
+    },
+    {
+      "name": "ChangeTipReceiver",
+      "accounts": [
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldTipReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newTipReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "blockBuilder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount1",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount2",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount4",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount5",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount6",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount7",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 1
+      }
+    },
+    {
+      "name": "ChangeBlockBuilder",
+      "accounts": [],
+      "args": [],
+      "discriminant": {
+        "type": "u8",
+        "value": 2
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tipReceiver",
+            "type": "publicKey"
+          },
+          {
+            "name": "blockBuilder",
+            "type": "publicKey"
+          },
+          {
+            "name": "blockBuilderCommissionPct",
+            "type": "u64"
+          },
+          {
+            "name": "bumps",
+            "type": {
+              "defined": "InitBumps"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TipPaymentAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sample",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "InitBumps",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "config",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount0",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount1",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount2",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount3",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount4",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount5",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount6",
+            "type": "u8"
+          },
+          {
+            "name": "tipPaymentAccount7",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 0,
+      "name": "ArithmeticError",
+      "msg": "ArithmeticError"
+    },
+    {
+      "code": 1,
+      "name": "InvalidFee",
+      "msg": "InvalidFee"
+    },
+    {
+      "code": 2,
+      "name": "InvalidTipReceiver",
+      "msg": "InvalidTipReceiver"
+    },
+    {
+      "code": 3,
+      "name": "InvalidBlockBuilder",
+      "msg": "InvalidBlockBuilder"
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt"
+  }
+}

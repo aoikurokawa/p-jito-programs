@@ -2,7 +2,7 @@
 members = [
     "core",
     "program",
-    "sdk",
+    "sdk", "shank-cli",
 ]
 resolver = "2"
 
@@ -12,6 +12,8 @@ edition = "2021"
 readme = "README.md"
 
 [workspace.dependencies]
+anyhow = "1.0.98"
+envfile = "0.2.1"
 jito-tip-payment-core = { path = "./core", version = "=0.0.1" }
 jito-tip-payment-sdk = { path = "./sdk", version = "=0.0.1" }
 litesvm = "0.6.1"
@@ -28,3 +30,6 @@ solana-system-interface = "1.0"
 solana-transaction = "2.2.0"
 test-log = "0.2.17"
 thiserror = "2.0.12"
+env_logger = "0.11.8"
+log = "0.4.27"
+shank_idl = "0.4.3"
