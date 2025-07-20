@@ -173,18 +173,6 @@
           }
         ]
       }
-    },
-    {
-      "name": "TipPaymentAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "sample",
-            "type": "u8"
-          }
-        ]
-      }
     }
   ],
   "types": [
