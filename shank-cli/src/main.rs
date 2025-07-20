@@ -44,12 +44,12 @@ fn main() -> Result<()> {
             let lib_rel_path = manifest
                 .lib_rel_path()
                 .ok_or_else(|| anyhow!("Program needs to be a lib"))?;
-            debug!("lib_rel_path: {:?}", lib_rel_path);
+            debug!("lib_rel_path: {lib_rel_path:?}");
             let lib_full_path_str = crate_root.join(path).join(lib_rel_path);
             let lib_full_path = lib_full_path_str
                 .to_str()
                 .ok_or_else(|| anyhow!("Invalid Path"))?;
-            debug!("lib_full_path: {:?}", lib_full_path);
+            debug!("lib_full_path: {lib_full_path:?}");
             // Extract IDL and convert to JSON
             let opts = ParseIdlOpts {
                 program_address_override: Some(idl.program_id.to_string()),
@@ -87,7 +87,7 @@ fn main() -> Result<()> {
         let mut idl_path = out_dir.join(idl.name);
         idl_path.set_extension("json");
 
-        info!("Writing IDL to {:?}", idl_path);
+        info!("Writing IDL to {idl_path:?}");
         let mut idl_json_file = File::create(idl_path)?;
         idl_json_file.write_all(idl_json.as_bytes())?;
     }

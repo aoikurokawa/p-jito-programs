@@ -1,8 +1,7 @@
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
 
-use crate::instruction::JitoTipPaymentInstruction;
-
+#[allow(clippy::too_many_arguments)]
 pub fn initialize_config(
     program_id: &Pubkey,
     config: &Pubkey,
@@ -32,10 +31,11 @@ pub fn initialize_config(
     Instruction {
         program_id: *program_id,
         accounts,
-        data: vec![JitoTipPaymentInstruction::Initialize as u8],
+        data: vec![175, 175, 109, 31, 13, 152, 155, 237],
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn change_tip_receiver(
     program_id: &Pubkey,
     config: &Pubkey,
@@ -70,6 +70,6 @@ pub fn change_tip_receiver(
     Instruction {
         program_id: *program_id,
         accounts,
-        data: vec![JitoTipPaymentInstruction::ChangeTipReceiver as u8],
+        data: vec![69, 99, 22, 71, 11, 231, 86, 143],
     }
 }

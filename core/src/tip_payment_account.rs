@@ -23,10 +23,10 @@ impl TipPaymentAccount {
         program_id: &Pubkey,
         account_info: &AccountInfo,
         payer: &AccountInfo,
-        system_program: &AccountInfo,
+        _system_program: &AccountInfo,
         rent: &Rent,
     ) -> Result<u8, ProgramError> {
-        let space = TipPaymentAccount::SIZE;
+        let space = Self::SIZE;
 
         // Validate PDA
         let (pubkey, bump) = find_program_address(&[seeds], program_id);
