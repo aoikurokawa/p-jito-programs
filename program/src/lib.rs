@@ -2,18 +2,20 @@
 
 use core::convert::TryFrom;
 
+use change_tip_receiver::ChangeTipReceiver;
 use initialize::Initialize;
+use jito_tip_payment_core::{fees::Fees, tip_payment_account::TipPaymentAccount};
+use jito_tip_payment_sdk::error::TipPaymentError;
 use pinocchio::{
-    account_info::AccountInfo,
-    entrypoint,
-    instruction::{Seed, Signer},
-    msg,
-    program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
-    ProgramResult,
+    account_info::AccountInfo, entrypoint, msg, program_error::ProgramError, pubkey::Pubkey,
+    sysvars::rent::Rent, ProgramResult,
 };
-use pinocchio_system::instructions::Transfer;
+use solana_sdk_ids::{
+    bpf_loader, bpf_loader_deprecated, bpf_loader_upgradeable, loader_v4, native_loader,
+    secp256r1_program,
+};
 
+mod change_tip_receiver;
 mod initialize;
 
 entrypoint!(process_instruction);
@@ -51,85 +53,142 @@ fn process_instruction(
             msg!("Instruction: InitializeConfig");
             Initialize::try_from((program_id, data, accounts))?.process()
         }
-        Some((Withdraw::DISCRIMINATOR, _)) => Withdraw::try_from(accounts)?.process(),
+        Some((ChangeTipReceiver::DISCRIMINATOR, _data)) => {
+            ChangeTipReceiver::try_from(accounts)?.process()
+        }
         _ => Err(ProgramError::InvalidInstructionData),
     }
 }
 
-pub struct WithdrawAccounts<'a> {
-    pub owner: &'a AccountInfo,
-    pub vault: &'a AccountInfo,
-    pub bumps: [u8; 1],
+#[inline(always)]
+unsafe fn is_program(account: &AccountInfo) -> bool {
+    account.owner() == &bpf_loader::id().to_bytes()
+        || *account.owner() == bpf_loader_deprecated::id().to_bytes()
+        || *account.owner() == bpf_loader_upgradeable::id().to_bytes()
+        || *account.owner() == loader_v4::id().to_bytes()
+        || *account.owner() == native_loader::id().to_bytes()
+
+        || *account.key() == native_loader::id().to_bytes()
+        // can remove once feature enable_secp256r1_precompile gets activated
+        || *account.key() == secp256r1_program::id().to_bytes()
+
+    // note: SIMD-0162 will remove support for this flag: https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0162-remove-accounts-executable-flag-checks.md
+    // || account.executable
 }
 
-impl<'a> TryFrom<&'a [AccountInfo]> for WithdrawAccounts<'a> {
-    type Error = ProgramError;
+/// Assumptions:
+/// - The transfer_amount are "dangling" lamports and need to be transferred somewhere to have a balanced instruction.
+/// - The receiver needs to remain rent exempt
+#[inline(always)]
+unsafe fn transfer_or_credit_tip_pda(
+    rent: &Rent,
+    receiver: &AccountInfo,
+    transfer_amount: u64,
+    tip_pda_fallback: &AccountInfo,
+) -> Result<u64, ProgramError> {
+    let balance_post_transfer = receiver
+        .lamports()
+        .checked_add(transfer_amount)
+        .ok_or(TipPaymentError::ArithmeticError)?;
 
-    fn try_from(accounts: &'a [AccountInfo]) -> Result<Self, Self::Error> {
-        let [owner, vault, _] = accounts else {
-            return Err(ProgramError::NotEnoughAccountKeys);
+    // Ensure the transfer amount is greater than 0, the account is rent-exempt after the transfer, and
+    // the transfer is not to a program
+    let can_transfer = transfer_amount > 0
+        && rent.is_exempt(balance_post_transfer, receiver.data_len())
+        // programs can't receive lamports until remove_accounts_executable_flag_checks is activated
+        && !is_program(receiver);
+
+    if can_transfer {
+        *receiver.try_borrow_mut_lamports()? = balance_post_transfer;
+        // Transfer {
+        //     from:
+        //     to:
+        //     amount
+        // }.invoke()?;
+        Ok(transfer_amount)
+    } else {
+        // These lamports can't be left dangling
+        let new_tip_pda_balance = tip_pda_fallback
+            .lamports()
+            .checked_add(transfer_amount)
+            .ok_or(TipPaymentError::ArithmeticError)?;
+        *tip_pda_fallback.try_borrow_mut_lamports()? = new_tip_pda_balance;
+        Ok(0)
+    }
+}
+
+/// Handles payment of the tips to the block builder and tip receiver
+/// Assumptions:
+/// - block_builder_commission_percent is a valid number (<= 100)
+#[inline(always)]
+unsafe fn handle_payments(
+    rent: &Rent,
+    tip_accounts: &[&AccountInfo],
+    tip_receiver: &AccountInfo,
+    block_builder: &AccountInfo,
+    block_builder_commission_percent: u64,
+) -> Result<(), ProgramError> {
+    let total_tips = TipPaymentAccount::drain_accounts(rent, tip_accounts)?;
+
+    let Fees {
+        block_builder_fee_lamports,
+        tip_receiver_fee_lamports,
+    } = Fees::calculate(total_tips, block_builder_commission_percent)?;
+
+    let amount_transferred_to_tip_receiver = if tip_receiver_fee_lamports > 0 {
+        let amount_transferred_to_tip_receiver = transfer_or_credit_tip_pda(
+            rent,
+            tip_receiver,
+            tip_receiver_fee_lamports,
+            tip_accounts.first().unwrap(),
+        )?;
+        if amount_transferred_to_tip_receiver == 0 {
+            // msg!(
+            //     "WARN: did not transfer tip receiver lamports to {:?}",
+            //     tip_receiver.key()
+            // );
+        }
+        amount_transferred_to_tip_receiver
+    } else {
+        0
+    };
+
+    let amount_transferred_to_block_builder = if block_builder_fee_lamports > 0 {
+        let amount_transferred_to_block_builder = transfer_or_credit_tip_pda(
+            rent,
+            block_builder,
+            block_builder_fee_lamports,
+            tip_accounts.first().unwrap(),
+        )?;
+        if amount_transferred_to_block_builder == 0 {
+            // msg!(
+            //     "WARN: did not transfer block builder lamports to {:?}",
+            //     block_builder.key()
+            // );
+        }
+        amount_transferred_to_block_builder
+    } else {
+        0
+    };
+
+    if amount_transferred_to_tip_receiver > 0 || amount_transferred_to_block_builder > 0 {
+        let tip_receiver = if amount_transferred_to_tip_receiver > 0 {
+            tip_receiver.key()
+        } else {
+            &Pubkey::default()
+        };
+        let block_builder = if amount_transferred_to_block_builder > 0 {
+            block_builder.key()
+        } else {
+            &Pubkey::default()
         };
 
-        // Basic Accounts Checks
-        if !owner.is_signer() {
-            return Err(ProgramError::InvalidAccountOwner);
-        }
-
-        if !vault.is_owned_by(&pinocchio_system::ID) {
-            return Err(ProgramError::InvalidAccountOwner);
-        }
-
-        if vault.lamports().eq(&0) {
-            return Err(ProgramError::InvalidAccountData);
-        }
-
-        let (vault_key, bump) = find_program_address(&[b"vault", owner.key().as_ref()], &crate::ID);
-        if &vault_key != vault.key() {
-            return Err(ProgramError::InvalidAccountOwner);
-        }
-
-        Ok(Self {
-            owner,
-            vault,
-            bumps: [bump],
-        })
+        // emit!(TipsClaimed {
+        //     tip_receiver,
+        //     tip_receiver_amount: amount_transferred_to_tip_receiver,
+        //     block_builder,
+        //     block_builder_amount: amount_transferred_to_block_builder,
+        // });
     }
-}
-
-pub struct Withdraw<'a> {
-    pub accounts: WithdrawAccounts<'a>,
-}
-
-impl<'a> TryFrom<&'a [AccountInfo]> for Withdraw<'a> {
-    type Error = ProgramError;
-
-    fn try_from(accounts: &'a [AccountInfo]) -> Result<Self, Self::Error> {
-        let accounts = WithdrawAccounts::try_from(accounts)?;
-
-        Ok(Self { accounts })
-    }
-}
-
-impl<'a> Withdraw<'a> {
-    pub const DISCRIMINATOR: &'a u8 = &1;
-
-    pub fn process(&mut self) -> ProgramResult {
-        // Create PDA signer seeds
-        let seeds = [
-            Seed::from(b"vault"),
-            Seed::from(self.accounts.owner.key().as_ref()),
-            Seed::from(&self.accounts.bumps),
-        ];
-        let signers = [Signer::from(&seeds)];
-
-        // Transfer all lamports from vault to owner
-        Transfer {
-            from: self.accounts.vault,
-            to: self.accounts.owner,
-            lamports: self.accounts.vault.lamports(),
-        }
-        .invoke_signed(&signers)?;
-
-        Ok(())
-    }
+    Ok(())
 }

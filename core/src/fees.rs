@@ -1,12 +1,15 @@
 use jito_tip_payment_sdk::error::TipPaymentError;
 
-struct Fees {
-    block_builder_fee_lamports: u64,
-    tip_receiver_fee_lamports: u64,
+pub struct Fees {
+    /// Block builder fee lamports
+    pub block_builder_fee_lamports: u64,
+
+    /// Tip receiver fee lamports
+    pub tip_receiver_fee_lamports: u64,
 }
 
 impl Fees {
-    fn calculate(
+    pub fn calculate(
         total_tips: u64,
         block_builder_commission_pct: u64,
     ) -> Result<Self, TipPaymentError> {
