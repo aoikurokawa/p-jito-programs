@@ -18,6 +18,6 @@ pub enum TipPaymentError {
 
 impl From<TipPaymentError> for ProgramError {
     fn from(value: TipPaymentError) -> Self {
-        ProgramError::Custom(value as u32)
+        Self::Custom(value as u32)
     }
 }
