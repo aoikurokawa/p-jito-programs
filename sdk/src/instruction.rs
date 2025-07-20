@@ -2,7 +2,7 @@ use pinocchio::program_error::ProgramError;
 use shank::ShankInstruction;
 
 #[repr(C)]
-#[derive(Clone, Debug, PartialEq, ShankInstruction)]
+#[derive(Clone, Debug, PartialEq, Eq, ShankInstruction)]
 pub enum JitoTipPaymentInstruction {
     /// Initialize
     #[account(0, writable, name = "config")]
@@ -38,7 +38,7 @@ pub enum JitoTipPaymentInstruction {
 }
 
 impl JitoTipPaymentInstruction {
-    pub fn try_from_slice(instruction_data: &[u8]) -> Result<Self, ProgramError> {
+    pub const fn try_from_slice(instruction_data: &[u8]) -> Result<Self, ProgramError> {
         let [discriminator0, discriminator1, discriminator2, discriminator3, discriminator4, discriminator5, discriminator6, discriminator7] =
             instruction_data
         else {

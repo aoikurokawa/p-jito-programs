@@ -1,6 +1,7 @@
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
 
+#[allow(clippy::too_many_arguments)]
 pub fn initialize_config(
     program_id: &Pubkey,
     config: &Pubkey,
@@ -34,6 +35,7 @@ pub fn initialize_config(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn change_tip_receiver(
     program_id: &Pubkey,
     config: &Pubkey,
