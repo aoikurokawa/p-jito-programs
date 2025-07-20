@@ -40,7 +40,7 @@ fn main() -> Result<()> {
                 ));
             }
             let manifest = Manifest::from_path(&cargo_toml)?;
-            debug!("manifest: {:?}", manifest);
+            debug!("manifest: {manifest:?}");
             let lib_rel_path = manifest
                 .lib_rel_path()
                 .ok_or_else(|| anyhow!("Program needs to be a lib"))?;

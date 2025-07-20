@@ -4,6 +4,23 @@ description = "Generated client for myproject"
 version = { workspace = true }
 edition = { workspace = true }
 
+[features]
+anchor = []
+anchor-idl-build = []
+fetch = []
+serde = []
+
 [dependencies]
 borsh = {workspace = true }
+solana-account-info = { workspace = true }
+solana-cpi = { workspace = true }
+solana-decode-error = { workspace = true }
+solana-msg = { workspace = true }
+solana-instruction = { workspace = true }
 solana-program = { workspace = true }
+solana-program-entrypoint = { workspace = true }
+solana-program-error = { workspace = true }
+solana-pubkey = { workspace = true }
+thiserror = { workspace = true }
+num-derive = { workspace = true }
+num-traits = "0.2.19"
