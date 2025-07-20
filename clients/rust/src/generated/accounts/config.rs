@@ -136,7 +136,7 @@ impl anchor_lang::Owner for Config {
 #[cfg(feature = "anchor-idl-build")]
 impl anchor_lang::IdlBuild for Config {}
 
-// #[cfg(feature = "anchor-idl-build")]
-// impl anchor_lang::Discriminator for Config {
-//     const DISCRIMINATOR: [u8; 8] = [0; 8];
-// }
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::Discriminator for Config {
+    const DISCRIMINATOR: [u8; 8] = [155, 12, 170, 224, 30, 250, 204, 130];
+}

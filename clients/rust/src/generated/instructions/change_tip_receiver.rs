@@ -109,12 +109,14 @@ impl ChangeTipReceiver {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ChangeTipReceiverInstructionData {
-    discriminator: u8,
+    discriminator: Vec<u8>,
 }
 
 impl ChangeTipReceiverInstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 1 }
+        Self {
+            discriminator: vec![69, 99, 22, 71, 11, 231, 86, 143],
+        }
     }
 }
 
