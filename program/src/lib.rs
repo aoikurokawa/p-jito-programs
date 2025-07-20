@@ -2,6 +2,7 @@
 
 use core::convert::TryFrom;
 
+use change_block_builder::process_change_block_builder;
 use change_tip_receiver::process_change_tip_receiver;
 use initialize::process_initialize;
 use jito_tip_payment_core::{fees::Fees, tip_payment_account::TipPaymentAccount};
@@ -63,7 +64,7 @@ fn process_instruction(
             block_builder_commission,
         } => {
             msg!("Instruction: ChangeBlockBuilder");
-            process
+            process_change_block_builder(program_id, accounts, block_builder_commission)
         }
     }
 }
