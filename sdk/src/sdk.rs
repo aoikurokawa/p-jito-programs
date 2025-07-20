@@ -1,8 +1,6 @@
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
 
-use crate::instruction::JitoTipPaymentInstruction;
-
 pub fn initialize_config(
     program_id: &Pubkey,
     config: &Pubkey,
