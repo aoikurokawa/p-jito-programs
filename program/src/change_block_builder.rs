@@ -14,7 +14,7 @@ use crate::handle_payments;
 /// this program. In order for the block builder to be changed, all previous tips must have been
 /// drained.
 pub fn process_change_block_builder(
-    program_id: &Pubkey,
+    _program_id: &Pubkey,
     accounts: &[AccountInfo],
     block_builder_commission: u64,
 ) -> Result<(), ProgramError> {
@@ -59,8 +59,8 @@ pub fn process_change_block_builder(
         handle_payments(
             &rent,
             tip_accounts,
-            &tip_receiver,
-            &old_block_builder,
+            tip_receiver,
+            old_block_builder,
             config.block_builder_commission_pct,
         )?;
     }

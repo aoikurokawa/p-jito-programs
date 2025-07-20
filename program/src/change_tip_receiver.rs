@@ -11,7 +11,7 @@ use crate::handle_payments;
 /// Validator should invoke this instruction before executing any transactions that contain tips.
 /// Validator should also ensure it calls it if there's a fork detected.
 pub fn process_change_tip_receiver(
-    program_id: &Pubkey,
+    _program_id: &Pubkey,
     accounts: &[AccountInfo],
 ) -> Result<(), ProgramError> {
     let [config, old_tip_receiver, new_tip_receiver, block_builder, tip_payment_account_0, tip_payment_account_1, tip_payment_account_2, tip_payment_account_3, tip_payment_account_4, tip_payment_account_5, tip_payment_account_6, tip_payment_account_7, signer] =
@@ -55,8 +55,8 @@ pub fn process_change_tip_receiver(
         handle_payments(
             &rent,
             tip_accounts,
-            &old_tip_receiver,
-            &block_builder,
+            old_tip_receiver,
+            block_builder,
             config.block_builder_commission_pct,
         )?;
     }
