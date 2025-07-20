@@ -91,12 +91,14 @@ impl Initialize {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InitializeInstructionData {
-    discriminator: u8,
+    discriminator: Vec<u8>,
 }
 
 impl InitializeInstructionData {
     pub fn new() -> Self {
-        Self { discriminator: 0 }
+        Self {
+            discriminator: vec![175, 175, 109, 31, 13, 152, 155, 237],
+        }
     }
 }
 
