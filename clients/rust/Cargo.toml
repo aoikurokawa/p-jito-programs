@@ -1,0 +1,9 @@
+[package]
+name = "jito-tip-payment-client"
+description = "Generated client for myproject"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+borsh = {workspace = true }
+solana-program = { workspace = true }

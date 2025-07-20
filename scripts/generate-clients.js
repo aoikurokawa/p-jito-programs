@@ -5,7 +5,7 @@ const renderers = require("@codama/renderers");
 
 const projectRoot = path.join(__dirname, "..");
 const idlDir = path.join(projectRoot, "idl");
-const idl = require(path.join(idlDir, "myproject.json"));
+const idl = require(path.join(idlDir, "jito_tip_payment.json"));
 const rustClientsDir = path.join(__dirname, "..", "clients", "rust");
 
 const Codama = codama.createFromRoot(anchorIdl.rootNodeFromAnchor(idl));
