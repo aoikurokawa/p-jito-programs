@@ -7,8 +7,9 @@ use pinocchio::{
     sysvars::rent::Rent,
 };
 use pinocchio_system::instructions::CreateAccount;
+use shank::ShankAccount;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, ShankAccount)]
 #[repr(C)]
 pub struct TipPaymentAccount {}
 

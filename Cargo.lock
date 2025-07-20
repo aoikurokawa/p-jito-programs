@@ -1468,6 +1468,7 @@ dependencies = [
  "jito-tip-payment-sdk",
  "pinocchio",
  "pinocchio-system",
+ "shank",
 ]
 
 [[package]]

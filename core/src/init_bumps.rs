@@ -1,4 +1,6 @@
-#[derive(Debug, Default, Clone)]
+use shank::ShankType;
+
+#[derive(Debug, Default, Clone, ShankType)]
 #[repr(C)]
 pub struct InitBumps {
     /// Config
