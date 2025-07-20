@@ -32,7 +32,7 @@ pub fn initialize_config(
     Instruction {
         program_id: *program_id,
         accounts,
-        data: vec![JitoTipPaymentInstruction::Initialize as u8],
+        data: vec![175, 175, 109, 31, 13, 152, 155, 237],
     }
 }
 
@@ -70,6 +70,6 @@ pub fn change_tip_receiver(
     Instruction {
         program_id: *program_id,
         accounts,
-        data: vec![JitoTipPaymentInstruction::ChangeTipReceiver as u8],
+        data: vec![69, 99, 22, 71, 11, 231, 86, 143],
     }
 }

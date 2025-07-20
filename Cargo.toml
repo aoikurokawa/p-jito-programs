@@ -14,8 +14,9 @@ edition = "2021"
 readme = "README.md"
 
 [workspace.dependencies]
-borsh = "1.5.5"
+anchor-lang = { version = "0.31.0", features = ["idl-build"] }
 anyhow = "1.0.98"
+borsh = "1.5.5"
 envfile = "0.2.1"
 jito-tip-payment-core = { path = "./core", version = "=0.0.1" }
 jito-tip-payment-sdk = { path = "./sdk", version = "=0.0.1" }
@@ -25,7 +26,9 @@ pinocchio = { version = "0.8.4" }
 pinocchio-pubkey = "0.2.3"
 pinocchio-system = "0.2.3"
 shank = { version = "0.4.3-alpha.1", features = ["pinocchio"] }
+solana-account = "2.2.0"
 solana-account-info = "2.2.0"
+solana-client = "2.2.0"
 solana-cpi = "2.2.0"
 solana-decode-error = "2.2.0"
 solana-msg = "2.2.0"
@@ -44,3 +47,6 @@ thiserror = "2.0.12"
 env_logger = "0.11.8"
 log = "0.4.27"
 shank_idl = "0.4.3"
+num-traits = "0.2.19"
+serde = "1.0.219"
+serde_with = "3.14.0"
