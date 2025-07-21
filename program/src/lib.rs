@@ -179,12 +179,12 @@ unsafe fn handle_payments(
     };
 
     if amount_transferred_to_tip_receiver > 0 || amount_transferred_to_block_builder > 0 {
-        let tip_receiver = if amount_transferred_to_tip_receiver > 0 {
+        let _tip_receiver = if amount_transferred_to_tip_receiver > 0 {
             tip_receiver.key()
         } else {
             &Pubkey::default()
         };
-        let block_builder = if amount_transferred_to_block_builder > 0 {
+        let _block_builder = if amount_transferred_to_block_builder > 0 {
             block_builder.key()
         } else {
             &Pubkey::default()

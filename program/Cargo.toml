@@ -23,3 +23,6 @@ solana-signer = { workspace = true }
 solana-transaction = { workspace = true }
 test-log = { workspace = true }
 thiserror = { workspace = true }
+
+[lints]
+workspace = true
