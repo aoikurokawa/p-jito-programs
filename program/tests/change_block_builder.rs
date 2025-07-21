@@ -9,7 +9,7 @@ mod tests {
         TIP_ACCOUNT_SEED_3, TIP_ACCOUNT_SEED_4, TIP_ACCOUNT_SEED_5, TIP_ACCOUNT_SEED_6,
         TIP_ACCOUNT_SEED_7,
     };
-    use jito_tip_payment_sdk::sdk::{change_tip_receiver, initialize_config};
+    use jito_tip_payment_sdk::sdk::{change_block_builder, change_tip_receiver, initialize_config};
     use solana_keypair::Keypair;
     use solana_pubkey::{pubkey, Pubkey};
     use solana_signer::Signer;
@@ -76,6 +76,34 @@ mod tests {
             &old_tip_receiver.pubkey(),
             &new_tip_receiver.pubkey(),
             &block_builder.pubkey(),
+            &tip_payment_0_pubkey,
+            &tip_payment_1_pubkey,
+            &tip_payment_2_pubkey,
+            &tip_payment_3_pubkey,
+            &tip_payment_4_pubkey,
+            &tip_payment_5_pubkey,
+            &tip_payment_6_pubkey,
+            &tip_payment_7_pubkey,
+            &user_kp.pubkey(),
+        );
+
+        let transaction = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&user_kp.pubkey()),
+            &[&user_kp],
+            svm.latest_blockhash(),
+        );
+
+        let _tx_resp = svm.send_transaction(transaction).unwrap();
+
+        let new_block_builder = Keypair::new();
+
+        let ix = change_block_builder(
+            &program_id,
+            &config_pubkey,
+            &new_tip_receiver.pubkey(),
+            &block_builder.pubkey(),
+            &new_block_builder.pubkey(),
             &tip_payment_0_pubkey,
             &tip_payment_1_pubkey,
             &tip_payment_2_pubkey,

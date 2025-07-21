@@ -51,7 +51,7 @@ pub enum JitoTipPaymentInstruction {
 }
 
 impl JitoTipPaymentInstruction {
-    pub const fn try_from_slice(instruction_data: &[u8]) -> Result<Self, ProgramError> {
+    pub fn try_from_slice(instruction_data: &[u8]) -> Result<Self, ProgramError> {
         let [discriminator0, discriminator1, discriminator2, discriminator3, discriminator4, discriminator5, discriminator6, discriminator7, remaining @ ..] =
             instruction_data
         else {
@@ -76,7 +76,7 @@ impl JitoTipPaymentInstruction {
 
             // ChangeBlockBuilder
             [134, 80, 38, 137, 165, 21, 114, 123] => {
-                let mut slice = [0, 0, 0, 0, 0, 0, 0, 0];
+                let mut slice = [0; 8];
                 slice.copy_from_slice(remaining);
                 let block_builder_commission = u64::from_be_bytes(slice);
 
