@@ -1,0 +1,221 @@
+name: ci
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security_audit:
+    name: security_audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install cargo-audit from crates.io
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-audit
+          version: "0.21.1"
+      - run: cargo audit --ignore RUSTSEC-2022-0093 --ignore RUSTSEC-2024-0344 --ignore RUSTSEC-2024-0421 --ignore RUSTSEC-2025-0022
+
+  # code_gen:
+  #   # cargo b && ./target/debug/jito-shank-cli && yarn generate-clients && cargo b
+  #   name: code generation
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         components: rustfmt, clippy
+  #         toolchain: 1.84.1
+  #     - name: Install system dependencies
+  #       run: sudo apt-get update && sudo apt-get install -y libudev-dev
+  #     - name: cargo build
+  #       run: cargo b -r
+  #     - name: Regenerate Shank IDL files
+  #       run: ./target/release/jito-shank-cli
+  #     - name: Verify no changed files
+  #       uses: tj-actions/verify-changed-files@v20
+  #       with:
+  #         fail-if-changed: true
+  #         fail-message: 'Unexpected changes in the shank IDL files. Please run `./target/release/jito-shank-cli` to regenerate the files.'
+  #     - name: Set Node.js 22.x
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 22.x
+  #     - name: Run install
+  #       uses: borales/actions-yarn@v4
+  #       with:
+  #         cmd: install
+  #     - name: Generate kinobi IDL files
+  #       uses: borales/actions-yarn@v4
+  #       with:
+  #         cmd: generate-clients
+  #     - name: Update dependencies
+  #       uses: borales/actions-yarn@v4
+  #       with:
+  #         cmd: update-dependencies
+  #     - name: Verify no changed files
+  #       uses: tj-actions/verify-changed-files@v20
+  #       id: verify-changed-kinobi-files
+  #     - name: Run step only when any of the above files change.
+  #       if: steps.verify-changed-kinobi-files.outputs.files_changed == 'true'
+  #       env:
+  #         CHANGED_FILES: ${{ steps.verify-changed-kinobi-files.outputs.changed_files }}
+  #       run: |
+  #         echo "Changed files: $CHANGED_FILES"
+  #         echo "Unexpected changes in the client files. Please run `yarn generate-clients` to regenerate the files."
+  #         exit 1
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+          toolchain: 1.84.1
+      - name: Install cargo-sort from crates.io
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-sort
+          version: "1.0.9"
+      - run: cargo sort --workspace --check
+      - run: cargo fmt --all --check
+      - run: cargo clippy --all-features -- -D warnings -D clippy::all -D clippy::nursery -D clippy::integer_division -D clippy::arithmetic_side_effects -D clippy::style -D clippy::perf
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      - uses: aarcangeli/load-dotenv@v1.0.0
+        with:
+          path: config
+          filenames: program.env
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: install solana toolsuite
+        run: sh -c "$(curl -sSfL https://release.anza.xyz/v2.2.14/install)"
+      - name: add to path
+        run: echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+      - name: Building programs
+        run: cargo-build-sbf
+        env:
+          JITO_TIP_PAYMENT_PROGRAM_ID: T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqf
+
+  verified_build:
+    name: verified_build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      - run: docker pull --platform linux/amd64 solanafoundation/solana-verifiable-build:2.2.14
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install solana-verify from crates.io
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: solana-verify
+
+      - run: solana-verify build --library-name jito_tip_payment_program --base-image solanafoundation/solana-verifiable-build:2.2.14
+
+      - name: Upload jito_tip_payment_program.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: jito_tip_payment_program.so
+          path: target/deploy/jito_tip_payment_program.so
+
+  # coverage:
+  #   name: coverage
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         components: rustfmt, clippy
+  #         toolchain: 1.84.1
+  #     - name: Install cargo-llvm-cov
+  #       uses: taiki-e/install-action@cargo-llvm-cov
+  #     - name: Install system dependencies
+  #       run: sudo apt-get update && sudo apt-get install -y libudev-dev
+  #     - name: Generate code coverage
+  #       run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+  #       env:
+  #         RESTAKING_PROGRAM_ID: RestkWeAVL8fRGgzhfeoqFhsqKRchg6aa1XrcH96z4Q
+  #         VAULT_PROGRAM_ID: Vau1t6sLNxnzB7ZDsef8TLbPLfyZMYXH8WTNqUdm9g8
+  #     - name: Upload coverage to Codecov
+  #       uses: codecov/codecov-action@v4.5.0
+  #       with:
+  #         token: ${{ secrets.CODECOV_TOKEN }}
+  #         slug: jito-foundation/restaking
+  #         fail_ci_if_error: true
+  #         codecov_yml_path: codecov.yaml
+
+  test_sbf:
+    name: cargo test
+    runs-on: ubuntu-latest
+    needs:
+      - verified_build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aarcangeli/load-dotenv@v1.0.0
+        with:
+          path: config
+          filenames: program.env
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
+      - name: Download jito tip payment program
+        uses: actions/download-artifact@v4
+        with:
+          name: jito_tip_payment_program.so
+          path: target/sbpf-solana-solana/release/
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo nextest run --all-features
+        env:
+          SBF_OUT_DIR: ${{ github.workspace }}/target/sbf-solana-solana/release
+
+  # create_release:
+  #   name: Create Release
+  #   needs:
+  #     - build
+  #     - test_sbf
+  #   runs-on: ubuntu-latest
+  #   if: startsWith(github.ref, 'refs/tags/')
+  #   steps:
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         merge-multiple: true
+  #     - run: ls -lh
+  #     - name: Release
+  #       uses: softprops/action-gh-release@v2
+  #       if: startsWith(github.ref, 'refs/tags/')
+  #       with:
+  #         files: |
+  #           *.so
+  #         fail_on_unmatched_files: true

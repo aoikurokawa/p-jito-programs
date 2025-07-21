@@ -23,7 +23,7 @@ mod tests {
         let mut svm = lite_svm_with_programs();
         svm.airdrop(&user_kp.pubkey(), 100_000_000).unwrap();
 
-        let program_id = pubkey!("22222222222222222222222222222222222222222222");
+        let program_id = pubkey!("T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqf");
 
         let (config_pubkey, _) = Pubkey::find_program_address(&[CONFIG_ACCOUNT_SEED], &program_id);
         let (tip_payment_0_pubkey, _) =

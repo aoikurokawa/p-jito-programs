@@ -18,7 +18,7 @@ pub fn process_change_block_builder(
     accounts: &[AccountInfo],
     block_builder_commission: u64,
 ) -> Result<(), ProgramError> {
-    let [config, tip_receiver, old_block_builder, new_block_builder, tip_payment_account_0, tip_payment_account_1, tip_payment_account_2, tip_payment_account_3, tip_payment_account_4, tip_payment_account_5, tip_payment_account_6, tip_payment_account_7, signer] =
+    let [config, tip_receiver, old_block_builder, new_block_builder, tip_payment_account_0, tip_payment_account_1, tip_payment_account_2, tip_payment_account_3, tip_payment_account_4, tip_payment_account_5, tip_payment_account_6, tip_payment_account_7, _signer] =
         accounts
     else {
         return Err(ProgramError::NotEnoughAccountKeys);

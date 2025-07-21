@@ -5,6 +5,7 @@ edition = { workspace = true }
 
 [lib]
 crate-type = ["lib", "cdylib"]
+name = "jito_tip_payment_program"
 
 [dependencies]
 jito-tip-payment-core = { workspace = true }
@@ -22,3 +23,6 @@ solana-signer = { workspace = true }
 solana-transaction = { workspace = true }
 test-log = { workspace = true }
 thiserror = { workspace = true }
+
+[lints]
+workspace = true
