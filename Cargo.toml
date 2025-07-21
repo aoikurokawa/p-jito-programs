@@ -1,11 +1,11 @@
 [workspace]
 members = [
+    "clients/rust"
+,
     "core",
     "program",
     "sdk",
-    "shank-cli",
-    "clients/rust"
-]
+    "shank-cli"]
 resolver = "2"
 
 [workspace.package]
