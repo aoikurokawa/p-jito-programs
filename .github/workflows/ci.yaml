@@ -185,16 +185,11 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libudev-dev
-      - name: Download restaking program
-        uses: actions/download-artifact@v4
-        with:
-          name: jito_tip_payment_program.so
-          path: target/sbf-solana-solana/release/
       - name: Download jito tip payment program
         uses: actions/download-artifact@v4
         with:
           name: jito_tip_payment_program.so
-          path: target/sbf-solana-solana/release/
+          path: target/sbpf-solana-solana/release/
       - uses: taiki-e/install-action@v2
         with:
           tool: nextest
