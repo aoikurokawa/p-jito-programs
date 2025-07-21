@@ -139,8 +139,79 @@
     },
     {
       "name": "ChangeBlockBuilder",
-      "accounts": [],
-      "args": [],
+      "accounts": [
+        {
+          "name": "config",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "oldBlockBuilder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "newBlockBuilder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount0",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount1",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount2",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount3",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount4",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount5",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount6",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tipPaymentAccount7",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "blockBuilderCommission",
+          "type": "u64"
+        }
+      ],
       "discriminant": {
         "type": "u8",
         "value": 2
@@ -245,6 +316,6 @@
   ],
   "metadata": {
     "origin": "shank",
-    "address": "T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt"
+    "address": "T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqf"
   }
 }

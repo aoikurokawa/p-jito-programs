@@ -5,6 +5,7 @@ edition = { workspace = true }
 
 [lib]
 crate-type = ["lib", "cdylib"]
+name = "jito_tip_payment_program"
 
 [dependencies]
 jito-tip-payment-core = { workspace = true }
