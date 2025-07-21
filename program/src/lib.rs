@@ -1,8 +1,7 @@
 #![no_std]
 
-use core::convert::TryFrom;
-
-use change_tip_receiver::ChangeTipReceiver;
+use change_block_builder::process_change_block_builder;
+use change_tip_receiver::process_change_tip_receiver;
 use initialize::process_initialize;
 use jito_tip_payment_core::{fees::Fees, tip_payment_account::TipPaymentAccount};
 use jito_tip_payment_sdk::{error::TipPaymentError, instruction::JitoTipPaymentInstruction};
@@ -15,19 +14,15 @@ use solana_sdk_ids::{
     secp256r1_program,
 };
 
+mod change_block_builder;
 mod change_tip_receiver;
 mod initialize;
 
 entrypoint!(process_instruction);
 // nostd_panic_handler!();
 
-// 22222222222222222222222222222222222222222222
-// pub const ID: Pubkey = [
-//     0x0f, 0x1e, 0x6b, 0x14, 0x21, 0xc0, 0x4a, 0x07, 0x04, 0x31, 0x26, 0x5c, 0x19, 0xc5, 0xbb, 0xee,
-//     0x19, 0x92, 0xba, 0xe8, 0xaf, 0xd1, 0xcd, 0x07, 0x8e, 0xf8, 0xaf, 0x70, 0x47, 0xdc, 0x11, 0xf7,
-// ];
-
 pinocchio_pubkey::declare_id!("22222222222222222222222222222222222222222222");
+
 /// We've decided to hardcode the seeds, effectively meaning the following PDAs owned by this program are singleton.
 ///
 /// This ensures that `initialize` can only be invoked once,
@@ -61,11 +56,13 @@ fn process_instruction(
         }
         JitoTipPaymentInstruction::ChangeTipReceiver => {
             msg!("Instruction: ChangeTipReceiver");
-            ChangeTipReceiver::try_from(accounts)?.process()
+            process_change_tip_receiver(program_id, accounts)
         }
-        JitoTipPaymentInstruction::ChangeBlockBuilder => {
+        JitoTipPaymentInstruction::ChangeBlockBuilder {
+            block_builder_commission,
+        } => {
             msg!("Instruction: ChangeBlockBuilder");
-            ChangeTipReceiver::try_from(accounts)?.process()
+            process_change_block_builder(program_id, accounts, block_builder_commission)
         }
     }
 }
