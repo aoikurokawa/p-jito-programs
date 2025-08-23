@@ -1,13 +1,13 @@
 [workspace]
 members = [
     "clients/rust",
+    "shank-cli",
     "tip-distribution-core",
-    "tip-distribution-sdk",
     "tip-distribution-program",
+    "tip-distribution-sdk",
     "tip-payment-core",
     "tip-payment-program",
     "tip-payment-sdk",
-    "shank-cli"
 ]
 resolver = "2"
 
@@ -20,41 +20,41 @@ readme = "README.md"
 anchor-lang = { version = "0.31.0", features = ["idl-build"] }
 anyhow = "1.0.98"
 borsh = "1.5.5"
+env_logger = "0.11.8"
 envfile = "0.2.1"
 jito-tip-distribution-core = { path = "tip-distribution-core", version = "=0.0.1" }
 jito-tip-distribution-sdk = { path = "tip-distribution-sdk", version = "=0.0.1" }
 jito-tip-payment-core = { path = "tip-payment-core", version = "=0.0.1" }
 jito-tip-payment-sdk = { path = "tip-payment-sdk", version = "=0.0.1" }
 litesvm = "0.6.1"
+log = "0.4.27"
 num-derive = "0.4.2"
+num-traits = "0.2.19"
 pinocchio = { version = "0.8.4" }
 pinocchio-pubkey = "0.2.3"
 pinocchio-system = "0.2.3"
+serde = "1.0.219"
+serde_with = "3.14.0"
 shank = { version = "0.4.3-alpha.1", features = ["pinocchio"] }
+shank_idl = "0.4.3"
 solana-account = "2.2.0"
 solana-account-info = "2.2.0"
 solana-client = "2.2.0"
 solana-cpi = "2.2.0"
 solana-decode-error = "2.2.0"
-solana-msg = "2.2.0"
-solana-keypair = "2.2.0"
 solana-instruction = "2.2.0"
+solana-keypair = "2.2.0"
+solana-msg = "2.2.0"
+solana-program = "2.2.0"
+solana-program-entrypoint = "2.2.0"
+solana-program-error = "2.2.0"
 solana-pubkey = "2.2.0"
 solana-sdk-ids = "2.2.0"
 solana-signer = "2.2.0"
 solana-system-interface = "1.0"
-solana-program = "2.2.0"
-solana-program-entrypoint = "2.2.0"
-solana-program-error = "2.2.0"
 solana-transaction = "2.2.0"
 test-log = "0.2.17"
 thiserror = "2.0.12"
-env_logger = "0.11.8"
-log = "0.4.27"
-shank_idl = "0.4.3"
-num-traits = "0.2.19"
-serde = "1.0.219"
-serde_with = "3.14.0"
 
 [workspace.lints.rust.unexpected_cfgs]
 level = "warn"

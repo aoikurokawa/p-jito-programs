@@ -11,10 +11,10 @@ name = "jito_tip_distribution_program"
 [dependencies]
 jito-tip-distribution-core = { workspace = true }
 jito-tip-distribution-sdk = { workspace = true }
-solana-program = { workspace = true }
 pinocchio = { workspace = true }
 pinocchio-pubkey = { workspace = true }
 pinocchio-system = { workspace = true }
+solana-program = { workspace = true }
 
 [lints]
 workspace = true
