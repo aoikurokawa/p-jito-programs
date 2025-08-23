@@ -1,8 +1,8 @@
 use pinocchio::program_error::ProgramError;
 use shank::ShankInstruction;
 
-#[repr(C)]
 #[derive(Clone, Debug, PartialEq, Eq, ShankInstruction)]
+#[repr(C)]
 pub enum JitoTipPaymentInstruction {
     /// Initialize
     #[account(0, writable, name = "config")]

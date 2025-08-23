@@ -2198,6 +2198,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "jito-tip-distribution-core"
+version = "0.0.1"
+dependencies = [
+ "jito-tip-distribution-sdk",
+ "pinocchio",
+ "pinocchio-system",
+ "shank",
+]
+
+[[package]]
+name = "jito-tip-distribution-program"
+version = "0.0.1"
+dependencies = [
+ "jito-tip-distribution-core",
+ "jito-tip-distribution-sdk",
+ "pinocchio",
+ "pinocchio-pubkey",
+ "pinocchio-system",
+ "solana-program",
+]
+
+[[package]]
+name = "jito-tip-distribution-sdk"
+version = "0.0.1"
+dependencies = [
+ "pinocchio",
+ "pinocchio-pubkey",
+ "shank",
+ "solana-instruction",
+ "solana-pubkey",
+ "solana-system-interface",
+ "thiserror 2.0.12",
+]
+
+[[package]]
 name = "jito-tip-payment-client"
 version = "0.0.1"
 dependencies = [
