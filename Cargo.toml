@@ -1,10 +1,9 @@
 [workspace]
 members = [
-    "clients/rust"
-,
-    "core",
-    "program",
-    "sdk",
+    "clients/rust",
+    "tip-payment-core",
+    "tip-payment-program",
+    "tip-payment-sdk",
     "shank-cli"]
 resolver = "2"
 
@@ -18,8 +17,8 @@ anchor-lang = { version = "0.31.0", features = ["idl-build"] }
 anyhow = "1.0.98"
 borsh = "1.5.5"
 envfile = "0.2.1"
-jito-tip-payment-core = { path = "./core", version = "=0.0.1" }
-jito-tip-payment-sdk = { path = "./sdk", version = "=0.0.1" }
+jito-tip-payment-core = { path = "tip-payment-core", version = "=0.0.1" }
+jito-tip-payment-sdk = { path = "tip-payment-sdk", version = "=0.0.1" }
 litesvm = "0.6.1"
 num-derive = "0.4.2"
 pinocchio = { version = "0.8.4" }
