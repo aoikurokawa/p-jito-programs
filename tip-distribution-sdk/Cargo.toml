@@ -1,0 +1,17 @@
+[package]
+name = "jito-tip-distribution-sdk"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[dependencies]
+pinocchio = { workspace = true }
+pinocchio-pubkey = { workspace = true }
+shank = { workspace = true }
+solana-instruction = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-system-interface = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

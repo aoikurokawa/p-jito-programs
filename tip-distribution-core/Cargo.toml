@@ -1,0 +1,14 @@
+[package]
+name = "jito-tip-distribution-core"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[dependencies]
+jito-tip-distribution-sdk = { workspace = true }
+pinocchio = { workspace = true }
+pinocchio-system = { workspace = true }
+shank = { workspace = true }
+
+[lints]
+workspace = true
