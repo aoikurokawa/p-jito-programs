@@ -1,4 +1,4 @@
-# p-jito-tip-payment
+# Jito Programs by Pinocchio
 
 ## Overview
 
