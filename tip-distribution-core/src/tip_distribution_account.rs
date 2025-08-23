@@ -48,7 +48,7 @@ impl TipDistributionAccount {
         if self.validator_vote_account == default_pubkey
             || self.merkle_root_upload_authority == default_pubkey
         {
-            return Err(TipDistributionError::AccountValidationFailure.into());
+            return Err(TipDistributionError::AccountValidationFailure);
         }
 
         Ok(())
@@ -67,11 +67,7 @@ impl TipDistributionAccount {
         Ok(amount)
     }
 
-    pub fn claim(
-        from: &AccountInfo,
-        to: &AccountInfo,
-        amount: u64,
-    ) -> Result<(), TipDistributionError> {
+    pub fn claim(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<(), ProgramError> {
         Self::transfer_lamports(from, to, amount)
     }
 
@@ -79,12 +75,13 @@ impl TipDistributionAccount {
         from: &AccountInfo,
         to: &AccountInfo,
         amount: u64,
-    ) -> Result<(), TipDistributionError> {
+    ) -> Result<(), ProgramError> {
         Transfer {
             from,
             to,
             lamports: amount,
-        };
+        }
+        .invoke()?;
         // debit lamports
         // *from.try_borrow_mut_lamports()? = from
         //     .lamports()

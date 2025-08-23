@@ -217,7 +217,13 @@ impl JitoTipDistributionInstruction {
                 let proof_len = u32::from_le_bytes(proof_len_bytes) as usize;
 
                 // Check if we have enough bytes for all proof elements
-                let expected_bytes = 13 + (proof_len * 32);
+                let expected_bytes = 13usize
+                    .checked_add(
+                        proof_len
+                            .checked_mul(32)
+                            .ok_or(ProgramError::InvalidInstructionData)?,
+                    )
+                    .ok_or(ProgramError::InvalidInstructionData)?;
                 if remaining.len() < expected_bytes {
                     return Err(ProgramError::InvalidInstructionData);
                 }
@@ -225,8 +231,15 @@ impl JitoTipDistributionInstruction {
                 // Read the proof vector
                 let mut proof = Vec::with_capacity(proof_len);
                 for i in 0..proof_len {
-                    let start_idx = 13 + (i * 32);
-                    let end_idx = start_idx + 32;
+                    let start_idx = 13usize
+                        .checked_add(
+                            i.checked_mul(32)
+                                .ok_or(ProgramError::InvalidInstructionData)?,
+                        )
+                        .ok_or(ProgramError::InvalidInstructionData)?;
+                    let end_idx = start_idx
+                        .checked_add(32usize)
+                        .ok_or(ProgramError::InvalidInstructionData)?;
 
                     let mut hash = [0u8; 32];
                     hash.copy_from_slice(&remaining[start_idx..end_idx]);

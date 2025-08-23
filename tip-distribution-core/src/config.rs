@@ -35,7 +35,7 @@ impl Config {
     pub const SIZE: usize = 8 + size_of::<Self>();
 
     /// Initialize a [`Config`]
-    pub fn new(
+    pub const fn new(
         authority: Pubkey,
         expired_funds_account: Pubkey,
         num_epochs_valid: u64,
@@ -60,16 +60,16 @@ impl Config {
         const MAX_VALIDATOR_COMMISSION_BPS: u16 = 10000;
 
         if self.num_epochs_valid == 0 || self.num_epochs_valid > MAX_NUM_EPOCHS_VALID {
-            return Err(TipDistributionError::AccountValidationFailure.into());
+            return Err(TipDistributionError::AccountValidationFailure);
         }
 
         if self.max_validator_commission_bps > MAX_VALIDATOR_COMMISSION_BPS {
-            return Err(TipDistributionError::AccountValidationFailure.into());
+            return Err(TipDistributionError::AccountValidationFailure);
         }
 
         let default_pubkey = Pubkey::default();
         if self.expired_funds_account == default_pubkey || self.authority == default_pubkey {
-            return Err(TipDistributionError::AccountValidationFailure.into());
+            return Err(TipDistributionError::AccountValidationFailure);
         }
 
         Ok(())
