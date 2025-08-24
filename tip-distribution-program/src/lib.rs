@@ -7,10 +7,12 @@ use pinocchio::{
 use crate::{
     initialize::process_initialize,
     initialize_tip_distribution_account::process_initialize_tip_distribution_account,
+    update_config::process_update_config,
 };
 
 mod initialize;
 mod initialize_tip_distribution_account;
+mod update_config;
 
 entrypoint!(process_instruction);
 
@@ -58,6 +60,22 @@ fn process_instruction(
                 merkle_root_upload_authority,
                 validator_commission_bps,
                 bump,
+            )
+        }
+        JitoTipDistributionInstruction::UpdateConfig {
+            authority,
+            expired_funds_account,
+            num_epochs_valid,
+            max_validator_commission_bps,
+        } => {
+            msg!("Instruction: UpdateConfig");
+            process_update_config(
+                program_id,
+                accounts,
+                authority,
+                expired_funds_account,
+                num_epochs_valid,
+                max_validator_commission_bps,
             )
         }
         _ => todo!(),
