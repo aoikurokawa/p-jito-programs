@@ -36,7 +36,6 @@ pub enum JitoTipDistributionInstruction {
         expired_funds_account: Pubkey,
         num_epochs_valid: u64,
         max_validator_commission_bps: u16,
-        bump: u8,
     },
 
     /// Upload merkle root
@@ -179,7 +178,6 @@ impl JitoTipDistributionInstruction {
                     expired_funds_account,
                     num_epochs_valid: u64::from_be_bytes(num_epochs_valid),
                     max_validator_commission_bps: u16::from_be_bytes(max_validator_commission_bps),
-                    bump: remaining[74],
                 })
             }
 

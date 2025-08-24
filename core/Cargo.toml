@@ -1,0 +1,13 @@
+[package]
+name = "jito-tip-core"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[dependencies]
+pinocchio = { workspace = true }
+pinocchio-pubkey = { workspace = true }
+pinocchio-system = { workspace = true }
+
+[lints]
+workspace = true
