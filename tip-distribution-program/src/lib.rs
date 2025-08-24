@@ -4,9 +4,13 @@ use pinocchio::{
     ProgramResult,
 };
 
-use crate::initialize::process_initialize;
+use crate::{
+    initialize::process_initialize,
+    initialize_tip_distribution_account::process_initialize_tip_distribution_account,
+};
 
 mod initialize;
+mod initialize_tip_distribution_account;
 
 entrypoint!(process_instruction);
 
@@ -39,6 +43,20 @@ fn process_instruction(
                 expired_funds_account,
                 num_epochs_valid,
                 max_validator_commission_bps,
+                bump,
+            )
+        }
+        JitoTipDistributionInstruction::InitializeTipDistributionAccount {
+            merkle_root_upload_authority,
+            validator_commission_bps,
+            bump,
+        } => {
+            msg!("Instruction: InitializeTipDistributionAccount");
+            process_initialize_tip_distribution_account(
+                program_id,
+                accounts,
+                merkle_root_upload_authority,
+                validator_commission_bps,
                 bump,
             )
         }

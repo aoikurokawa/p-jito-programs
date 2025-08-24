@@ -1,0 +1,12 @@
+[package]
+name = "vote-state"
+version.workspace = true
+edition.workspace = true
+readme.workspace = true
+
+[dependencies]
+pinocchio = { workspace = true }
+solana-program = { workspace = true }
+
+[lints]
+workspace = true
