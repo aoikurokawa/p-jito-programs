@@ -43,6 +43,9 @@ unsafe impl Transmutable for TipDistributionAccount {
 }
 
 impl TipDistributionAccount {
+    pub const SEED: &'static [u8] = b"TIP_DISTRIBUTION_ACCOUNT";
+    pub const SIZE: usize = 8 + size_of::<Self>();
+
     pub fn validate(&self) -> Result<(), TipDistributionError> {
         let default_pubkey = Pubkey::default();
         if self.validator_vote_account == default_pubkey
