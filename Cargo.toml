@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "clients/rust",
+    "core",
     "shank-cli",
     "tip-distribution-core",
     "tip-distribution-program",
@@ -22,6 +23,7 @@ anyhow = "1.0.98"
 borsh = "1.5.5"
 env_logger = "0.11.8"
 envfile = "0.2.1"
+jito-tip-core = { path = "core", version = "=0.0.1" }
 jito-tip-distribution-core = { path = "tip-distribution-core", version = "=0.0.1" }
 jito-tip-distribution-sdk = { path = "tip-distribution-sdk", version = "=0.0.1" }
 jito-tip-payment-core = { path = "tip-payment-core", version = "=0.0.1" }

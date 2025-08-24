@@ -2198,6 +2198,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "jito-tip-core"
+version = "0.0.1"
+dependencies = [
+ "pinocchio",
+ "pinocchio-pubkey",
+ "pinocchio-system",
+]
+
+[[package]]
 name = "jito-tip-distribution-core"
 version = "0.0.1"
 dependencies = [
@@ -2211,6 +2220,7 @@ dependencies = [
 name = "jito-tip-distribution-program"
 version = "0.0.1"
 dependencies = [
+ "jito-tip-core",
  "jito-tip-distribution-core",
  "jito-tip-distribution-sdk",
  "pinocchio",
