@@ -10,6 +10,7 @@ use crate::{
     initialize::process_initialize,
     initialize_merkle_root_upload_config::process_initialize_merkle_root_upload_config,
     initialize_tip_distribution_account::process_initialize_tip_distribution_account,
+    migrate_tda_merkle_root_upload_authority::process_migrate_tda_merkle_root_upload_authority,
     update_config::process_update_config,
     update_merkle_root_upload_config::process_update_merkle_root_upload_config,
     upload_merkle_root::process_upload_merkle_root,
@@ -21,6 +22,7 @@ mod close_tip_distribution_account;
 mod initialize;
 mod initialize_merkle_root_upload_config;
 mod initialize_tip_distribution_account;
+mod migrate_tda_merkle_root_upload_authority;
 mod update_config;
 mod update_merkle_root_upload_config;
 mod upload_merkle_root;
@@ -137,7 +139,10 @@ fn process_instruction(
                 original_authority,
             )
         }
-        _ => todo!(),
+        JitoTipDistributionInstruction::MigrateTdaMerkleRootUploadAuthority => {
+            msg!("Instruction: MigrateTdaMerkleRootUploadAuthority");
+            process_migrate_tda_merkle_root_upload_authority(program_id, accounts)
+        }
     }
 }
 
