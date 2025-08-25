@@ -1,6 +1,6 @@
 use jito_tip_core::{create_account, loader::load_signer};
 use jito_tip_distribution_core::{
-    claim_status::ClaimStatus, config::Config, load_mut_unchecked, load_unchecked,
+    claim_status::ClaimStatus, config::Config, load_mut_unchecked,
     tip_distribution_account::TipDistributionAccount, Transmutable,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
@@ -31,9 +31,8 @@ pub fn process_claim(
     let current_epoch = Clock::get()?.epoch;
 
     unsafe {
-        Config::load(program_id, config_info, true)?;
+        Config::load(program_id, config_info, false)?;
     }
-    let _config = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
 
     unsafe {
         TipDistributionAccount::load(
@@ -85,9 +84,6 @@ pub fn process_claim(
     };
 
     claim_status.bump = bump;
-
-    // let claimant_account = &mut ctx.accounts.claimant;
-    // let tip_distribution_account = &mut ctx.accounts.tip_distribution_account;
 
     let clock = Clock::get()?;
     if clock.epoch > tip_distribution_account.expires_at {

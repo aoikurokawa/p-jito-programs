@@ -32,9 +32,10 @@ litesvm = "0.6.1"
 log = "0.4.27"
 num-derive = "0.4.2"
 num-traits = "0.2.19"
-pinocchio = { version = "0.8.4" }
+pinocchio = { version = "0.9.0" }
+pinocchio-log = "0.5.0"
 pinocchio-pubkey = "0.2.3"
-pinocchio-system = "0.2.3"
+pinocchio-system = "0.3.0"
 serde = "1.0.219"
 serde_with = "3.14.0"
 shank = { version = "0.4.3-alpha.1", features = ["pinocchio"] }

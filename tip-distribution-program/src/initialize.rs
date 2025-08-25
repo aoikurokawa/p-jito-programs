@@ -1,3 +1,4 @@
+use jito_tip_core::{create_account, loader::load_system_program};
 use jito_tip_distribution_core::{config::Config, load_mut_unchecked, Transmutable};
 use pinocchio::{
     account_info::AccountInfo,
@@ -6,7 +7,6 @@ use pinocchio::{
     pubkey::{find_program_address, Pubkey},
     sysvars::{rent::Rent, Sysvar},
 };
-use pinocchio_system::instructions::CreateAccount;
 
 /// Initialize a singleton instance of the [Config] account.
 pub fn process_initialize(
@@ -18,30 +18,34 @@ pub fn process_initialize(
     max_validator_commission_bps: u16,
     bump: u8,
 ) -> Result<(), ProgramError> {
-    let [config, _system_program, initializer] = accounts else {
+    let [config_info, system_program_info, initializer_info] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    load_system_program(system_program_info)?;
+
     let rent = Rent::get()?;
-
     let space = Config::LEN;
-    let required_lamports = rent.minimum_balance(space);
+    let seeds = Config::seeds();
+    let seeds: Vec<&[u8]> = seeds.iter().map(|seed| seed.as_slice()).collect();
+    let (_merkle_root_upload_config_pubkey, merkle_root_upload_config_bump) =
+        find_program_address(&seeds, program_id);
 
-    let (_config_pubkey, config_bump) = find_program_address(&[Config::SEED], program_id);
-
-    let bindings = [config_bump];
+    let bindings = [merkle_root_upload_config_bump];
     let seeds = [Seed::from(Config::SEED), Seed::from(&bindings)];
     let signers = [Signer::from(&seeds)];
-    CreateAccount {
-        from: initializer,
-        to: config,
-        lamports: required_lamports,
-        space: space as u64,
-        owner: program_id,
-    }
-    .invoke_signed(&signers)?;
 
-    let cfg = unsafe { load_mut_unchecked::<Config>(config.borrow_mut_data_unchecked())? };
+    create_account(
+        initializer_info,
+        config_info,
+        system_program_info,
+        program_id,
+        &rent,
+        space as u64,
+        &signers,
+    )?;
+
+    let cfg = unsafe { load_mut_unchecked::<Config>(config_info.borrow_mut_data_unchecked())? };
 
     cfg.authority = authority;
     cfg.expired_funds_account = expired_funds_account;

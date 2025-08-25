@@ -13,6 +13,7 @@ jito-tip-core = { workspace = true }
 jito-tip-distribution-core = { workspace = true }
 jito-tip-distribution-sdk = { workspace = true }
 pinocchio = { workspace = true }
+pinocchio-log = { workspace = true }
 pinocchio-pubkey = { workspace = true }
 pinocchio-system = { workspace = true }
 solana-program = { workspace = true }

@@ -11,9 +11,10 @@ use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
     program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
+    pubkey::Pubkey,
     sysvars::{rent::Rent, Sysvar},
 };
+use pinocchio_log::log;
 
 pub fn process_initialize_merkle_root_upload_config(
     program_id: &Pubkey,
@@ -28,7 +29,7 @@ pub fn process_initialize_merkle_root_upload_config(
     };
 
     unsafe {
-        Config::load(program_id, config_info, true)?;
+        Config::load(program_id, config_info, false)?;
     }
     let config = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
 
@@ -43,15 +44,30 @@ pub fn process_initialize_merkle_root_upload_config(
 
     let rent = Rent::get()?;
     let space = MerkleRootUploadConfig::LEN;
-    let seeds = MerkleRootUploadConfig::seeds();
-    let seeds: Vec<&[u8]> = seeds.iter().map(|seed| seed.as_slice()).collect();
-    let (_merkle_root_upload_config_pubkey, merkle_root_upload_config_bump) =
-        find_program_address(&seeds, program_id);
 
-    let bindings = [merkle_root_upload_config_bump];
-    let seeds = [Seed::from(Config::SEED), Seed::from(&bindings)];
-    let signers = [Signer::from(&seeds)];
+    let (
+        merkle_root_upload_config_pubkey,
+        merkle_root_upload_config_bump,
+        mut merkle_root_upload_config_seed,
+    ) = MerkleRootUploadConfig::find_program_address(program_id);
+    merkle_root_upload_config_seed.push(vec![merkle_root_upload_config_bump]);
 
+    if merkle_root_upload_config_pubkey.ne(merkle_root_upload_config_info.key()) {
+        log!("MerkleRootUploadConfig account is not at the correct PDA");
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    let seeds: Vec<Seed> = merkle_root_upload_config_seed
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+
+    let signers = [Signer::from(seeds.as_slice())];
+
+    log!(
+        "Initializing MerkleRootUploadConfig at address {}",
+        merkle_root_upload_config_info.key()
+    );
     create_account(
         payer_info,
         merkle_root_upload_config_info,
