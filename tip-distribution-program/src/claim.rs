@@ -61,9 +61,7 @@ pub fn process_claim(
     load_signer(payer_info, true)?;
 
     let rent = Rent::get()?;
-
     let space = ClaimStatus::LEN;
-
     let seeds = ClaimStatus::seeds(*claimant_info.key(), *tip_distribution_account_info.key());
     let seeds: Vec<&[u8]> = seeds.iter().map(|seed| seed.as_slice()).collect();
     let (_claim_status_pubkey, claim_status_bump) = find_program_address(&seeds, program_id);
