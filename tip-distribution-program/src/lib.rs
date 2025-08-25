@@ -8,6 +8,7 @@ use crate::{
     claim::process_claim, close_claim_status::process_close_claim_status,
     close_tip_distribution_account::process_close_tip_distribution_account,
     initialize::process_initialize,
+    initialize_merkle_root_upload_config::process_initialize_merkle_root_upload_config,
     initialize_tip_distribution_account::process_initialize_tip_distribution_account,
     update_config::process_update_config, upload_merkle_root::process_upload_merkle_root,
 };
@@ -16,6 +17,7 @@ mod claim;
 mod close_claim_status;
 mod close_tip_distribution_account;
 mod initialize;
+mod initialize_merkle_root_upload_config;
 mod initialize_tip_distribution_account;
 mod update_config;
 mod upload_merkle_root;
@@ -107,6 +109,18 @@ fn process_instruction(
         } => {
             msg!("Instruction: Claim");
             process_claim(program_id, accounts, bump, amount, proof)
+        }
+        JitoTipDistributionInstruction::InitializeMerkleRootUploadConfig {
+            authority,
+            original_authority,
+        } => {
+            msg!("Instruction: InitializeMerkleRootUploadConfig");
+            process_initialize_merkle_root_upload_config(
+                program_id,
+                accounts,
+                authority,
+                original_authority,
+            )
         }
         _ => todo!(),
     }
