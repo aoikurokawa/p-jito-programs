@@ -42,7 +42,7 @@ pub fn process_migrate_tda_merkle_root_upload_authority(
     }
     let merkle_root_upload_config = unsafe {
         load_unchecked::<MerkleRootUploadConfig>(
-            tip_distribution_account_info.borrow_data_unchecked(),
+            merkle_root_upload_config_info.borrow_data_unchecked(),
         )?
     };
 

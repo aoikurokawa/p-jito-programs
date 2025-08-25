@@ -34,6 +34,9 @@ pub fn process_upload_merkle_root(
     unsafe {
         Config::load(program_id, config_info, true)?;
     }
+
+    load_signer(merkle_root_upload_authority_info, false)?;
+
     unsafe {
         TipDistributionAccount::load(
             program_id,
@@ -43,9 +46,6 @@ pub fn process_upload_merkle_root(
             true,
         )?;
     }
-
-    load_signer(merkle_root_upload_authority_info, false)?;
-
     let tip_distribution_account = unsafe {
         load_mut_unchecked::<TipDistributionAccount>(
             tip_distribution_account_info.borrow_mut_data_unchecked(),
