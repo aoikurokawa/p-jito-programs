@@ -37,6 +37,7 @@ pub fn process_initialize_merkle_root_upload_config(
         return Err(TipDistributionError::Unauthorized.into());
     }
 
+    load_signer(authority_info, true)?;
     load_signer(payer_info, true)?;
     load_system_program(system_program_info)?;
 

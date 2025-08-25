@@ -10,7 +10,9 @@ use crate::{
     initialize::process_initialize,
     initialize_merkle_root_upload_config::process_initialize_merkle_root_upload_config,
     initialize_tip_distribution_account::process_initialize_tip_distribution_account,
-    update_config::process_update_config, upload_merkle_root::process_upload_merkle_root,
+    update_config::process_update_config,
+    update_merkle_root_upload_config::process_update_merkle_root_upload_config,
+    upload_merkle_root::process_upload_merkle_root,
 };
 
 mod claim;
@@ -20,6 +22,7 @@ mod initialize;
 mod initialize_merkle_root_upload_config;
 mod initialize_tip_distribution_account;
 mod update_config;
+mod update_merkle_root_upload_config;
 mod upload_merkle_root;
 
 entrypoint!(process_instruction);
@@ -116,6 +119,18 @@ fn process_instruction(
         } => {
             msg!("Instruction: InitializeMerkleRootUploadConfig");
             process_initialize_merkle_root_upload_config(
+                program_id,
+                accounts,
+                authority,
+                original_authority,
+            )
+        }
+        JitoTipDistributionInstruction::UpdateMerkleRootUploadConfig {
+            authority,
+            original_authority,
+        } => {
+            msg!("Instruction: UpdateMerkleRootUploadConfig");
+            process_update_merkle_root_upload_config(
                 program_id,
                 accounts,
                 authority,
