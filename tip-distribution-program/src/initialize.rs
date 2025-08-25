@@ -1,12 +1,16 @@
+use jito_tip_core::{
+    create_account,
+    loader::{load_signer, load_system_program},
+};
 use jito_tip_distribution_core::{config::Config, load_mut_unchecked, Transmutable};
 use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
     program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
+    pubkey::Pubkey,
     sysvars::{rent::Rent, Sysvar},
 };
-use pinocchio_system::instructions::CreateAccount;
+use pinocchio_log::log;
 
 /// Initialize a singleton instance of the [Config] account.
 pub fn process_initialize(
@@ -18,30 +22,43 @@ pub fn process_initialize(
     max_validator_commission_bps: u16,
     bump: u8,
 ) -> Result<(), ProgramError> {
-    let [config, _system_program, initializer] = accounts else {
+    let [config_info, system_program_info, initializer_info] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    load_signer(initializer_info, true)?;
+    load_system_program(system_program_info)?;
+
     let rent = Rent::get()?;
-
     let space = Config::LEN;
-    let required_lamports = rent.minimum_balance(space);
 
-    let (_config_pubkey, config_bump) = find_program_address(&[Config::SEED], program_id);
+    let (config_pubkey, config_bump, mut config_seed) = Config::find_program_address(program_id);
+    config_seed.push(vec![config_bump]);
 
-    let bindings = [config_bump];
-    let seeds = [Seed::from(Config::SEED), Seed::from(&bindings)];
-    let signers = [Signer::from(&seeds)];
-    CreateAccount {
-        from: initializer,
-        to: config,
-        lamports: required_lamports,
-        space: space as u64,
-        owner: program_id,
+    if config_pubkey.ne(config_info.key()) {
+        log!("Config account is not at the correct PDA");
+        return Err(ProgramError::InvalidAccountData);
     }
-    .invoke_signed(&signers)?;
 
-    let cfg = unsafe { load_mut_unchecked::<Config>(config.borrow_mut_data_unchecked())? };
+    let seeds: Vec<Seed> = config_seed
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+
+    let signers = [Signer::from(seeds.as_slice())];
+
+    log!("Initializing Config at address {}", config_info.key());
+    create_account(
+        initializer_info,
+        config_info,
+        system_program_info,
+        program_id,
+        &rent,
+        space as u64,
+        &signers,
+    )?;
+
+    let cfg = unsafe { load_mut_unchecked::<Config>(config_info.borrow_mut_data_unchecked())? };
 
     cfg.authority = authority;
     cfg.expired_funds_account = expired_funds_account;

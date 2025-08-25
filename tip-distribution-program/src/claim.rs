@@ -1,6 +1,6 @@
 use jito_tip_core::{create_account, loader::load_signer};
 use jito_tip_distribution_core::{
-    claim_status::ClaimStatus, config::Config, load_mut_unchecked, load_unchecked,
+    claim_status::ClaimStatus, config::Config, load_mut_unchecked,
     tip_distribution_account::TipDistributionAccount, Transmutable,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
@@ -8,9 +8,10 @@ use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
     program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
+    pubkey::Pubkey,
     sysvars::{clock::Clock, rent::Rent, Sysvar},
 };
+use pinocchio_log::log;
 
 use crate::verify;
 
@@ -31,9 +32,8 @@ pub fn process_claim(
     let current_epoch = Clock::get()?.epoch;
 
     unsafe {
-        Config::load(program_id, config_info, true)?;
+        Config::load(program_id, config_info, false)?;
     }
-    let _config = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
 
     unsafe {
         TipDistributionAccount::load(
@@ -62,14 +62,28 @@ pub fn process_claim(
 
     let rent = Rent::get()?;
     let space = ClaimStatus::LEN;
-    let seeds = ClaimStatus::seeds(*claimant_info.key(), *tip_distribution_account_info.key());
-    let seeds: Vec<&[u8]> = seeds.iter().map(|seed| seed.as_slice()).collect();
-    let (_claim_status_pubkey, claim_status_bump) = find_program_address(&seeds, program_id);
 
-    let bindings = [claim_status_bump];
-    let seeds = [Seed::from(Config::SEED), Seed::from(&bindings)];
-    let signers = [Signer::from(&seeds)];
+    let (claim_status_pubkey, claim_status_bump, mut claim_status_seed) =
+        ClaimStatus::find_program_address(
+            program_id,
+            *claimant_info.key(),
+            *tip_distribution_account_info.key(),
+        );
+    claim_status_seed.push(vec![claim_status_bump]);
 
+    if claim_status_pubkey.ne(claim_status_info.key()) {
+        log!("ClaimStatus account is not at the correct PDA");
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    let seeds: Vec<Seed> = claim_status_seed
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+
+    let signers = [Signer::from(seeds.as_slice())];
+
+    log!("Initializing ClaimStatus at address {}", config_info.key());
     create_account(
         payer_info,
         claim_status_info,
@@ -85,9 +99,6 @@ pub fn process_claim(
     };
 
     claim_status.bump = bump;
-
-    // let claimant_account = &mut ctx.accounts.claimant;
-    // let tip_distribution_account = &mut ctx.accounts.tip_distribution_account;
 
     let clock = Clock::get()?;
     if clock.epoch > tip_distribution_account.expires_at {

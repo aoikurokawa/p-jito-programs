@@ -26,7 +26,7 @@ pub fn process_close_tip_distribution_account(
     let current_epoch = Clock::get()?.epoch;
 
     unsafe {
-        Config::load(program_id, config_info, true)?;
+        Config::load(program_id, config_info, false)?;
     }
     let config = unsafe { load_mut_unchecked::<Config>(config_info.borrow_mut_data_unchecked())? };
 
@@ -36,7 +36,7 @@ pub fn process_close_tip_distribution_account(
             tip_distribution_account_info,
             validator_vote_account_info.key(),
             current_epoch,
-            true,
+            false,
         )?;
     }
     let tip_distribution_account = unsafe {

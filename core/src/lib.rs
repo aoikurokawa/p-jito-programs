@@ -93,7 +93,7 @@ pub unsafe fn close_program_account(
     *account_to_close.borrow_mut_lamports_unchecked() = 0;
 
     account_to_close.assign(&pinocchio_system::id());
-    account_to_close.realloc(0, false)?;
+    account_to_close.resize(0)?;
 
     Ok(())
 }
@@ -113,6 +113,7 @@ pub fn realloc(
         lamports: lamports_diff,
     }
     .invoke()?;
-    account.realloc(new_size, false)?;
+    account.resize(new_size)?;
+
     Ok(())
 }
