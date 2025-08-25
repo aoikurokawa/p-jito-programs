@@ -7,12 +7,13 @@ use pinocchio::{
 use crate::{
     initialize::process_initialize,
     initialize_tip_distribution_account::process_initialize_tip_distribution_account,
-    update_config::process_update_config,
+    update_config::process_update_config, upload_merkle_root::process_upload_merkle_root,
 };
 
 mod initialize;
 mod initialize_tip_distribution_account;
 mod update_config;
+mod upload_merkle_root;
 
 entrypoint!(process_instruction);
 
@@ -77,6 +78,14 @@ fn process_instruction(
                 num_epochs_valid,
                 max_validator_commission_bps,
             )
+        }
+        JitoTipDistributionInstruction::UploadMerkleRoot {
+            root,
+            max_total_claim,
+            max_num_nodes,
+        } => {
+            msg!("Instruction: UploadMerkleRoot");
+            process_upload_merkle_root(program_id, accounts, root, max_total_claim, max_num_nodes)
         }
         _ => todo!(),
     }

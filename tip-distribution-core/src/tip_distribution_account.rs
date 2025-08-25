@@ -1,8 +1,9 @@
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{
     account_info::AccountInfo,
+    msg,
     program_error::ProgramError,
-    pubkey::Pubkey,
+    pubkey::{find_program_address, Pubkey},
     sysvars::{rent::Rent, Sysvar},
 };
 use pinocchio_system::instructions::Transfer;
@@ -45,6 +46,7 @@ unsafe impl Transmutable for TipDistributionAccount {
 impl TipDistributionAccount {
     pub const SEED: &'static [u8] = b"TIP_DISTRIBUTION_ACCOUNT";
     pub const SIZE: usize = 8 + size_of::<Self>();
+    pub const DISCRIMINATOR: &'static [u8] = &[85, 64, 113, 198, 234, 94, 120, 123];
 
     pub fn validate(&self) -> Result<(), TipDistributionError> {
         let default_pubkey = Pubkey::default();
@@ -99,7 +101,60 @@ impl TipDistributionAccount {
         Ok(())
     }
 
-    pub fn seeds() -> Vec<Vec<u8>> {
-        vec![b"TIP_DISTRIBUTION_ACCOUNT".to_vec()]
+    /// Returns the seeds for the PDA
+    pub fn seeds(validator_vote_account: &Pubkey, epoch: u64) -> Vec<Vec<u8>> {
+        vec![
+            b"TIP_DISTRIBUTION_ACCOUNT".to_vec(),
+            validator_vote_account.to_vec(),
+            epoch.to_le_bytes().to_vec(),
+        ]
+    }
+
+    /// Find the program address for the PDA
+    pub fn find_program_address(
+        program_id: &Pubkey,
+        validator_vote_account: &Pubkey,
+        epoch: u64,
+    ) -> (Pubkey, u8, Vec<Vec<u8>>) {
+        let seeds = Self::seeds(validator_vote_account, epoch);
+        let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
+        let (pda, bump) = find_program_address(&seeds_iter, program_id);
+        (pda, bump, seeds)
+    }
+
+    /// Attempts to load the account as [`TipDistributionAccount`], returning an error if it's not valid.
+    ///
+    /// # Safety
+    pub unsafe fn load(
+        program_id: &Pubkey,
+        tip_distribution_account: &AccountInfo,
+        validator_vote_account: &Pubkey,
+        epoch: u64,
+        expect_writable: bool,
+    ) -> Result<(), ProgramError> {
+        if tip_distribution_account.owner().ne(program_id) {
+            msg!("TipDistributionAccount has an invalid owner");
+            return Err(ProgramError::InvalidAccountOwner);
+        }
+        if tip_distribution_account.data_is_empty() {
+            msg!("TipDistributionAccount data is empty");
+            return Err(ProgramError::InvalidAccountData);
+        }
+        if expect_writable && !tip_distribution_account.is_writable() {
+            msg!("TipDistributionAccount is not writable");
+            return Err(ProgramError::InvalidAccountData);
+        }
+        let data = tip_distribution_account.borrow_data_unchecked();
+        if data[0..8].ne(Self::DISCRIMINATOR) {
+            msg!("TipDistributionAccount discriminator is invalid");
+            return Err(ProgramError::InvalidAccountData);
+        }
+        let expected_pubkey =
+            Self::find_program_address(program_id, validator_vote_account, epoch).0;
+        if tip_distribution_account.key().ne(&expected_pubkey) {
+            msg!("TipDistributionAccount is not at the correct PDA");
+            return Err(ProgramError::InvalidAccountData);
+        }
+        Ok(())
     }
 }
