@@ -41,10 +41,10 @@ pub enum JitoTipDistributionInstruction {
     /// Upload merkle root
     #[account(0, name = "config")]
     #[account(1, writable, name = "tip_distribution_account")]
-    #[account(2, writable, signer, name = "merkle_root_upload_authority")]
+    #[account(2, signer, name = "merkle_root_upload_authority")]
     UploadMerkleRoot {
         root: [u8; 32],
-        max_total_claim: u32,
+        max_total_claim: u64,
         max_num_nodes: u64,
     },
 
@@ -186,7 +186,7 @@ impl JitoTipDistributionInstruction {
                 let mut root = [0; 32];
                 root.copy_from_slice(&remaining[0..32]);
 
-                let mut max_total_claim = [0; 4];
+                let mut max_total_claim = [0; 8];
                 max_total_claim.copy_from_slice(&remaining[32..36]);
 
                 let mut max_num_nodes = [0; 8];
@@ -194,7 +194,7 @@ impl JitoTipDistributionInstruction {
 
                 Ok(Self::UploadMerkleRoot {
                     root,
-                    max_total_claim: u32::from_be_bytes(max_total_claim),
+                    max_total_claim: u64::from_be_bytes(max_total_claim),
                     max_num_nodes: u64::from_be_bytes(max_num_nodes),
                 })
             }
