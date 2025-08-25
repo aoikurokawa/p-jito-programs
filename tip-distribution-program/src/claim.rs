@@ -8,9 +8,10 @@ use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
     program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
+    pubkey::Pubkey,
     sysvars::{clock::Clock, rent::Rent, Sysvar},
 };
+use pinocchio_log::log;
 
 use crate::verify;
 
@@ -61,14 +62,28 @@ pub fn process_claim(
 
     let rent = Rent::get()?;
     let space = ClaimStatus::LEN;
-    let seeds = ClaimStatus::seeds(*claimant_info.key(), *tip_distribution_account_info.key());
-    let seeds: Vec<&[u8]> = seeds.iter().map(|seed| seed.as_slice()).collect();
-    let (_claim_status_pubkey, claim_status_bump) = find_program_address(&seeds, program_id);
 
-    let bindings = [claim_status_bump];
-    let seeds = [Seed::from(Config::SEED), Seed::from(&bindings)];
-    let signers = [Signer::from(&seeds)];
+    let (claim_status_pubkey, claim_status_bump, mut claim_status_seed) =
+        ClaimStatus::find_program_address(
+            program_id,
+            *claimant_info.key(),
+            *tip_distribution_account_info.key(),
+        );
+    claim_status_seed.push(vec![claim_status_bump]);
 
+    if claim_status_pubkey.ne(claim_status_info.key()) {
+        log!("ClaimStatus account is not at the correct PDA");
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    let seeds: Vec<Seed> = claim_status_seed
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+
+    let signers = [Signer::from(seeds.as_slice())];
+
+    log!("Initializing ClaimStatus at address {}", config_info.key());
     create_account(
         payer_info,
         claim_status_info,

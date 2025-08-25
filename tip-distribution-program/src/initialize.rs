@@ -1,12 +1,16 @@
-use jito_tip_core::{create_account, loader::load_system_program};
+use jito_tip_core::{
+    create_account,
+    loader::{load_signer, load_system_program},
+};
 use jito_tip_distribution_core::{config::Config, load_mut_unchecked, Transmutable};
 use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
     program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
+    pubkey::Pubkey,
     sysvars::{rent::Rent, Sysvar},
 };
+use pinocchio_log::log;
 
 /// Initialize a singleton instance of the [Config] account.
 pub fn process_initialize(
@@ -22,19 +26,28 @@ pub fn process_initialize(
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    load_signer(initializer_info, true)?;
     load_system_program(system_program_info)?;
 
     let rent = Rent::get()?;
     let space = Config::LEN;
-    let seeds = Config::seeds();
-    let seeds: Vec<&[u8]> = seeds.iter().map(|seed| seed.as_slice()).collect();
-    let (_merkle_root_upload_config_pubkey, merkle_root_upload_config_bump) =
-        find_program_address(&seeds, program_id);
 
-    let bindings = [merkle_root_upload_config_bump];
-    let seeds = [Seed::from(Config::SEED), Seed::from(&bindings)];
-    let signers = [Signer::from(&seeds)];
+    let (config_pubkey, config_bump, mut config_seed) = Config::find_program_address(program_id);
+    config_seed.push(vec![config_bump]);
 
+    if config_pubkey.ne(config_info.key()) {
+        log!("Config account is not at the correct PDA");
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    let seeds: Vec<Seed> = config_seed
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+
+    let signers = [Signer::from(seeds.as_slice())];
+
+    log!("Initializing Config at address {}", config_info.key());
     create_account(
         initializer_info,
         config_info,

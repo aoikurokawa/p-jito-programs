@@ -1,3 +1,7 @@
+use jito_tip_core::{
+    create_account,
+    loader::{load_signer, load_system_program},
+};
 use jito_tip_distribution_core::{
     config::Config, load_mut_unchecked, load_unchecked,
     tip_distribution_account::TipDistributionAccount, Transmutable,
@@ -7,10 +11,10 @@ use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
     program_error::ProgramError,
-    pubkey::{find_program_address, Pubkey},
+    pubkey::Pubkey,
     sysvars::{clock::Clock, rent::Rent, Sysvar},
 };
-use pinocchio_system::instructions::CreateAccount;
+use pinocchio_log::log;
 
 /// Initialize a new [TipDistributionAccount] associated with the given validator vote key
 /// and current epoch.
@@ -21,13 +25,16 @@ pub fn process_initialize_tip_distribution_account(
     validator_commission_bps: u16,
     bump: u8,
 ) -> Result<(), ProgramError> {
-    let [config, tip_distribution_account, validator_vote_account, signer, _system_program] =
+    let [config_info, tip_distribution_account_info, validator_vote_account_info, signer_info, system_program_info] =
         accounts
     else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    let cfg = unsafe { load_unchecked::<Config>(config.borrow_data_unchecked())? };
+    load_signer(signer_info, true)?;
+    load_system_program(system_program_info)?;
+
+    let cfg = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
 
     if validator_commission_bps > cfg.max_validator_commission_bps {
         return Err(TipDistributionError::MaxValidatorCommissionFeeBpsExceeded.into());
@@ -39,36 +46,54 @@ pub fn process_initialize_tip_distribution_account(
     // }
 
     let current_epoch = Clock::get()?.epoch;
+
     let rent = Rent::get()?;
-
     let space = TipDistributionAccount::LEN;
-    let required_lamports = rent.minimum_balance(space);
 
-    let (_config_pubkey, tip_distribution_account_bump) =
-        find_program_address(&[TipDistributionAccount::SEED], program_id);
+    let (
+        tip_distribution_account_pubkey,
+        tip_distribution_account_bump,
+        mut tip_distribution_account_seed,
+    ) = TipDistributionAccount::find_program_address(
+        program_id,
+        validator_vote_account_info.key(),
+        current_epoch,
+    );
+    tip_distribution_account_seed.push(vec![tip_distribution_account_bump]);
 
-    let bindings = [tip_distribution_account_bump];
-    let seeds = [
-        Seed::from(TipDistributionAccount::SEED),
-        Seed::from(&bindings),
-    ];
-    let signers = [Signer::from(&seeds)];
-    CreateAccount {
-        from: signer,
-        to: config,
-        lamports: required_lamports,
-        space: space as u64,
-        owner: program_id,
+    if tip_distribution_account_pubkey.ne(tip_distribution_account_info.key()) {
+        log!("TipDistributionAccount account is not at the correct PDA");
+        return Err(ProgramError::InvalidAccountData);
     }
-    .invoke_signed(&signers)?;
+
+    let seeds: Vec<Seed> = tip_distribution_account_seed
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+
+    let signers = [Signer::from(seeds.as_slice())];
+
+    log!(
+        "Initializing TipDistributionAccount at address {}",
+        tip_distribution_account_info.key()
+    );
+    create_account(
+        signer_info,
+        tip_distribution_account_info,
+        system_program_info,
+        program_id,
+        &rent,
+        space as u64,
+        &signers,
+    )?;
 
     let tip_distribution_account = unsafe {
         load_mut_unchecked::<TipDistributionAccount>(
-            tip_distribution_account.borrow_mut_data_unchecked(),
+            tip_distribution_account_info.borrow_mut_data_unchecked(),
         )?
     };
 
-    tip_distribution_account.validator_vote_account = *validator_vote_account.key();
+    tip_distribution_account.validator_vote_account = *validator_vote_account_info.key();
     tip_distribution_account.epoch_created_at = current_epoch;
     tip_distribution_account.validator_commission_bps = validator_commission_bps;
     tip_distribution_account.merkle_root_upload_authority = merkle_root_upload_authority;
