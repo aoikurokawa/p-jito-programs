@@ -5,13 +5,14 @@ use pinocchio::{
 };
 
 use crate::{
-    close_claim_status::process_close_claim_status,
+    claim::process_claim, close_claim_status::process_close_claim_status,
     close_tip_distribution_account::process_close_tip_distribution_account,
     initialize::process_initialize,
     initialize_tip_distribution_account::process_initialize_tip_distribution_account,
     update_config::process_update_config, upload_merkle_root::process_upload_merkle_root,
 };
 
+mod claim;
 mod close_claim_status;
 mod close_tip_distribution_account;
 mod initialize;
@@ -98,6 +99,14 @@ fn process_instruction(
         JitoTipDistributionInstruction::CloseTipDistributionAccount => {
             msg!("Instruction: CloseTipDistributionAccount");
             process_close_tip_distribution_account(program_id, accounts)
+        }
+        JitoTipDistributionInstruction::Claim {
+            bump,
+            amount,
+            proof,
+        } => {
+            msg!("Instruction: Claim");
+            process_claim(program_id, accounts, bump, amount, proof)
         }
         _ => todo!(),
     }
