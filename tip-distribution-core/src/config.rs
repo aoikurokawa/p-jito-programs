@@ -32,7 +32,7 @@ pub struct Config {
 
 unsafe impl Transmutable for Config {
     // header, fields, and InitBumps
-    const LEN: usize = std::mem::size_of::<Config>();
+    const LEN: usize = std::mem::size_of::<Self>();
 }
 
 impl Config {
