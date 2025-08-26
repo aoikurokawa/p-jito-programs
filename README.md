@@ -12,8 +12,8 @@ Reimplement Jito Programs by Pinocchio
 
 | Instruction          | CU (p-jito-programs) | CU (jito-programs) |
 | -------------------- | -------------------- | ------------------ |
-| `Initialize`         |                      |                    |
-| `ChangeTipReceiver`  |                      | 30055              |
+| `Initialize`         | 37232                |                    |
+| `ChangeTipReceiver`  | 904                  | 30055              |
 | `ChangeBlockBuilder` |                      | 28654              |
 
 ### Tip Distribution Program

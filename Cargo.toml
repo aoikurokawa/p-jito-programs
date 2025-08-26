@@ -1,5 +1,5 @@
 [workspace]
-members = [ "cli",
+members = [
     "clients/rust",
     "core",
     "shank-cli",

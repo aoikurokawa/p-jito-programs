@@ -14,7 +14,8 @@ pub enum JitoTipPaymentInstruction {
     #[account(6, writable, name = "tip_payment_account_5")]
     #[account(7, writable, name = "tip_payment_account_6")]
     #[account(8, writable, name = "tip_payment_account_7")]
-    #[account(9, writable, signer, name = "payer")]
+    #[account(9, name = "system_program")]
+    #[account(10, writable, signer, name = "payer")]
     Initialize,
 
     /// Change tip receiver
