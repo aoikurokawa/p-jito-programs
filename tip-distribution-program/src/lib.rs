@@ -29,7 +29,8 @@ mod upload_merkle_root;
 
 entrypoint!(process_instruction);
 
-pinocchio_pubkey::declare_id!("4R3gSG8BpU4t19KYj8CfnbtRpnT8gtk4dvTHxVRwc2r7");
+// pinocchio_pubkey::declare_id!("4R3gSG8BpU4t19KYj8CfnbtRpnT8gtk4dvTHxVRwc2r7");
+pinocchio_pubkey::declare_id!("4bcCNzLDuuMqx7AZiE6zysaz2ie5SE765mcZQVdFakec");
 
 fn process_instruction(
     program_id: &Pubkey,

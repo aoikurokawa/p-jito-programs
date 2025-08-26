@@ -62,15 +62,18 @@ impl Config {
         const MAX_VALIDATOR_COMMISSION_BPS: u16 = 10000;
 
         if self.num_epochs_valid == 0 || self.num_epochs_valid > MAX_NUM_EPOCHS_VALID {
+            msg!("num_epochs should be more than 0 and less than 10");
             return Err(TipDistributionError::AccountValidationFailure);
         }
 
         if self.max_validator_commission_bps > MAX_VALIDATOR_COMMISSION_BPS {
+            msg!("max_validator_commission_bps should be less than 10000");
             return Err(TipDistributionError::AccountValidationFailure);
         }
 
         let default_pubkey = Pubkey::default();
         if self.expired_funds_account == default_pubkey || self.authority == default_pubkey {
+            msg!("expired_funds_account should not default pubkey");
             return Err(TipDistributionError::AccountValidationFailure);
         }
 

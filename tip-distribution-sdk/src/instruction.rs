@@ -138,8 +138,8 @@ impl JitoTipDistributionInstruction {
                 Ok(Self::Initialize {
                     authority,
                     expired_funds_account,
-                    num_epochs_valid: u64::from_be_bytes(num_epochs_valid),
-                    max_validator_commission_bps: u16::from_be_bytes(max_validator_commission_bps),
+                    num_epochs_valid: u64::from_le_bytes(num_epochs_valid),
+                    max_validator_commission_bps: u16::from_le_bytes(max_validator_commission_bps),
                     bump: remaining[74],
                 })
             }
@@ -154,7 +154,7 @@ impl JitoTipDistributionInstruction {
 
                 Ok(Self::InitializeTipDistributionAccount {
                     merkle_root_upload_authority,
-                    validator_commission_bps: u16::from_be_bytes(validator_commission_bps),
+                    validator_commission_bps: u16::from_le_bytes(validator_commission_bps),
                     bump: remaining[34],
                 })
             }
@@ -177,7 +177,7 @@ impl JitoTipDistributionInstruction {
                     authority,
                     expired_funds_account,
                     num_epochs_valid: u64::from_be_bytes(num_epochs_valid),
-                    max_validator_commission_bps: u16::from_be_bytes(max_validator_commission_bps),
+                    max_validator_commission_bps: u16::from_le_bytes(max_validator_commission_bps),
                 })
             }
 
@@ -194,8 +194,8 @@ impl JitoTipDistributionInstruction {
 
                 Ok(Self::UploadMerkleRoot {
                     root,
-                    max_total_claim: u64::from_be_bytes(max_total_claim),
-                    max_num_nodes: u64::from_be_bytes(max_num_nodes),
+                    max_total_claim: u64::from_le_bytes(max_total_claim),
+                    max_num_nodes: u64::from_le_bytes(max_num_nodes),
                 })
             }
 
@@ -246,7 +246,7 @@ impl JitoTipDistributionInstruction {
 
                 Ok(Self::Claim {
                     bump: remaining[0],
-                    amount: u64::from_be_bytes(amount),
+                    amount: u64::from_le_bytes(amount),
                     proof,
                 })
             }
