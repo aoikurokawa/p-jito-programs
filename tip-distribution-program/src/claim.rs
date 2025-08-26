@@ -35,7 +35,7 @@ pub fn process_claim(
         Config::load(program_id, config_info, false)?;
     }
 
-    unsafe {
+    let tip_distribution_account = unsafe {
         TipDistributionAccount::load(
             program_id,
             tip_distribution_account_info,
@@ -43,10 +43,8 @@ pub fn process_claim(
             current_epoch,
             false,
         )?;
-    }
-    let tip_distribution_account = unsafe {
         load_mut_unchecked::<TipDistributionAccount>(
-            tip_distribution_account_info.borrow_mut_data_unchecked(),
+            &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
     };
 
@@ -61,7 +59,9 @@ pub fn process_claim(
     load_signer(payer_info, true)?;
 
     let rent = Rent::get()?;
-    let space = ClaimStatus::LEN;
+    let space = 8usize
+        .checked_add(ClaimStatus::LEN)
+        .ok_or(TipDistributionError::ArithmeticError)?;
 
     let (claim_status_pubkey, claim_status_bump, mut claim_status_seed) =
         ClaimStatus::find_program_address(

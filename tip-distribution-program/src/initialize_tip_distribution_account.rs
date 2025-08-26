@@ -34,9 +34,16 @@ pub fn process_initialize_tip_distribution_account(
     load_signer(signer_info, true)?;
     load_system_program(system_program_info)?;
 
-    let cfg = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
-
+    let cfg = unsafe {
+        Config::load(program_id, config_info, false)?;
+        load_unchecked::<Config>(&config_info.borrow_data_unchecked()[8..])?
+    };
     if validator_commission_bps > cfg.max_validator_commission_bps {
+        log!(
+            "Validator commission BPS {} should be less than {}",
+            validator_commission_bps,
+            cfg.max_validator_commission_bps
+        );
         return Err(TipDistributionError::MaxValidatorCommissionFeeBpsExceeded.into());
     }
 
@@ -48,7 +55,9 @@ pub fn process_initialize_tip_distribution_account(
     let current_epoch = Clock::get()?.epoch;
 
     let rent = Rent::get()?;
-    let space = TipDistributionAccount::LEN;
+    let space = 8usize
+        .checked_add(TipDistributionAccount::LEN)
+        .ok_or(TipDistributionError::ArithmeticError)?;
 
     let (
         tip_distribution_account_pubkey,

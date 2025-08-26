@@ -32,12 +32,11 @@ pub struct Config {
 
 unsafe impl Transmutable for Config {
     // header, fields, and InitBumps
-    const LEN: usize = 8 + 32 + 32 + 8 + 2 + 1;
+    const LEN: usize = std::mem::size_of::<Self>();
 }
 
 impl Config {
     pub const SEED: &'static [u8] = b"CONFIG_ACCOUNT";
-    pub const SIZE: usize = 8 + size_of::<Self>();
     pub const DISCRIMINATOR: &'static [u8] = &[155, 12, 170, 224, 30, 250, 204, 130];
 
     /// Initialize a [`Config`]

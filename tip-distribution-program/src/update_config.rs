@@ -16,13 +16,12 @@ pub fn process_update_config(
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    unsafe {
+    let config = unsafe {
         Config::load(program_id, config_info, true)?;
-    }
+        load_mut_unchecked::<Config>(&mut config_info.borrow_mut_data_unchecked()[8..])?
+    };
 
     load_signer(authority_info, false)?;
-
-    let config = unsafe { load_mut_unchecked::<Config>(config_info.borrow_mut_data_unchecked())? };
 
     if config.authority.ne(authority_info.key()) {
         return Err(TipDistributionError::Unauthorized.into());

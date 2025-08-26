@@ -22,7 +22,7 @@ pub fn process_migrate_tda_merkle_root_upload_authority(
 
     let current_epoch = Clock::get()?.epoch;
 
-    unsafe {
+    let tip_distribution_account = unsafe {
         TipDistributionAccount::load(
             program_id,
             tip_distribution_account_info,
@@ -30,19 +30,16 @@ pub fn process_migrate_tda_merkle_root_upload_authority(
             current_epoch,
             true,
         )?;
-    }
-    let tip_distribution_account = unsafe {
+
         load_mut_unchecked::<TipDistributionAccount>(
-            tip_distribution_account_info.borrow_mut_data_unchecked(),
+            &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
     };
 
-    unsafe {
-        MerkleRootUploadConfig::load(program_id, merkle_root_upload_config_info, false)?;
-    }
     let merkle_root_upload_config = unsafe {
+        MerkleRootUploadConfig::load(program_id, merkle_root_upload_config_info, false)?;
         load_unchecked::<MerkleRootUploadConfig>(
-            merkle_root_upload_config_info.borrow_data_unchecked(),
+            &merkle_root_upload_config_info.borrow_data_unchecked()[8..],
         )?
     };
 

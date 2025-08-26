@@ -30,7 +30,3 @@ pub struct InitBumps {
     /// Tip payment account 7
     pub tip_payment_account_7: u8,
 }
-
-impl InitBumps {
-    pub(crate) const SIZE: usize = 9;
-}

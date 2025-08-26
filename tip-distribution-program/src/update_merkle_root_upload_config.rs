@@ -19,10 +19,10 @@ pub fn process_update_merkle_root_upload_config(
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    unsafe {
+    let config = unsafe {
         Config::load(program_id, config_info, false)?;
-    }
-    let config = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
+        load_unchecked::<Config>(&config_info.borrow_data_unchecked()[8..])?
+    };
 
     // Call the authorize function
     if config.authority.ne(authority_info.key()) {
@@ -32,12 +32,10 @@ pub fn process_update_merkle_root_upload_config(
     load_signer(merkle_root_upload_config_info, false)?;
     load_system_program(system_program_info)?;
 
-    unsafe {
-        MerkleRootUploadConfig::load(program_id, config_info, true)?;
-    }
     let merkle_root_upload_config = unsafe {
+        MerkleRootUploadConfig::load(program_id, config_info, true)?;
         load_mut_unchecked::<MerkleRootUploadConfig>(
-            merkle_root_upload_config_info.borrow_mut_data_unchecked(),
+            &mut merkle_root_upload_config_info.borrow_mut_data_unchecked()[8..],
         )?
     };
 
