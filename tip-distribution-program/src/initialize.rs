@@ -3,6 +3,7 @@ use jito_tip_core::{
     loader::{load_signer, load_system_program},
 };
 use jito_tip_distribution_core::{config::Config, load_mut_unchecked, Transmutable};
+use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{
     account_info::AccountInfo,
     instruction::{Seed, Signer},
@@ -30,7 +31,9 @@ pub fn process_initialize(
     load_system_program(system_program_info)?;
 
     let rent = Rent::get()?;
-    let space = Config::LEN;
+    let space = 8usize
+        .checked_add(Config::LEN)
+        .ok_or(TipDistributionError::ArithmeticError)?;
 
     let (config_pubkey, config_bump, mut config_seed) = Config::find_program_address(program_id);
     config_seed.push(vec![config_bump]);

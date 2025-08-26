@@ -24,7 +24,7 @@ pub struct MerkleRootUploadConfig {
 
 unsafe impl Transmutable for MerkleRootUploadConfig {
     // header, fields, and InitBumps
-    const LEN: usize = 8 + 32 + 32 + 1;
+    const LEN: usize = std::mem::size_of::<MerkleRootUploadConfig>();
 }
 
 impl MerkleRootUploadConfig {

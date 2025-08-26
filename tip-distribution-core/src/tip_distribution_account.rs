@@ -40,7 +40,7 @@ pub struct TipDistributionAccount {
 
 unsafe impl Transmutable for TipDistributionAccount {
     // header, fields, and InitBumps
-    const LEN: usize = 8 + 32 + 32 + 8 + 1;
+    const LEN: usize = std::mem::size_of::<TipDistributionAccount>();
 }
 
 impl TipDistributionAccount {

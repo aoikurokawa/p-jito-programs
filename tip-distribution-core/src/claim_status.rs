@@ -36,7 +36,7 @@ pub struct ClaimStatus {
 
 unsafe impl Transmutable for ClaimStatus {
     // header, fields, and InitBumps
-    const LEN: usize = 8 + 1 + 32 + 32 + 8 + 8 + 8 + 1;
+    const LEN: usize = std::mem::size_of::<ClaimStatus>();
 }
 
 impl ClaimStatus {

@@ -48,7 +48,9 @@ pub fn process_initialize_tip_distribution_account(
     let current_epoch = Clock::get()?.epoch;
 
     let rent = Rent::get()?;
-    let space = TipDistributionAccount::LEN;
+    let space = 8usize
+        .checked_add(TipDistributionAccount::LEN)
+        .ok_or(TipDistributionError::ArithmeticError)?;
 
     let (
         tip_distribution_account_pubkey,
