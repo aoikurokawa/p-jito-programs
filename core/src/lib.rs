@@ -7,7 +7,9 @@ use pinocchio_system::instructions::{Allocate, Assign, CreateAccount, Transfer};
 pub mod loader;
 
 /// Creates a new account or initializes an existing account
+///
 /// # Arguments
+///
 /// * `payer` - The account that will pay for the lamports
 /// * `new_account` - The account to create or initialize
 /// * `system_program` - The system program account
@@ -15,7 +17,9 @@ pub mod loader;
 /// * `rent` - The rent sysvar
 /// * `space` - The space to allocate
 /// * `seeds` - The seeds to use for the PDA
+///
 /// # Returns
+///
 /// * `ProgramResult` - The result of the operation
 #[inline(always)]
 pub fn create_account(

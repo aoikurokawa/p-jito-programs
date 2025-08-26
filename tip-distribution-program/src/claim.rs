@@ -95,7 +95,9 @@ pub fn process_claim(
     )?;
 
     let claim_status = unsafe {
-        load_mut_unchecked::<ClaimStatus>(claim_status_info.borrow_mut_data_unchecked())?
+        let claim_status_info_data = claim_status_info.borrow_mut_data_unchecked();
+        claim_status_info_data[0..8].copy_from_slice(ClaimStatus::DISCRIMINATOR);
+        load_mut_unchecked::<ClaimStatus>(&mut claim_status_info_data[8..])?
     };
 
     claim_status.bump = bump;

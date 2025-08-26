@@ -58,7 +58,11 @@ pub fn process_initialize(
         &signers,
     )?;
 
-    let cfg = unsafe { load_mut_unchecked::<Config>(config_info.borrow_mut_data_unchecked())? };
+    let cfg = unsafe {
+        let config_data = config_info.borrow_mut_data_unchecked();
+        config_data[0..8].copy_from_slice(Config::DISCRIMINATOR);
+        load_mut_unchecked::<Config>(&mut config_data[8..])?
+    };
 
     cfg.authority = authority;
     cfg.expired_funds_account = expired_funds_account;
