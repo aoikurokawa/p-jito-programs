@@ -37,7 +37,7 @@ pub fn process_upload_merkle_root(
 
     load_signer(merkle_root_upload_authority_info, false)?;
 
-    unsafe {
+    let tip_distribution_account = unsafe {
         TipDistributionAccount::load(
             program_id,
             tip_distribution_account_info,
@@ -45,10 +45,8 @@ pub fn process_upload_merkle_root(
             current_epoch,
             true,
         )?;
-    }
-    let tip_distribution_account = unsafe {
         load_mut_unchecked::<TipDistributionAccount>(
-            tip_distribution_account_info.borrow_mut_data_unchecked(),
+            &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
     };
 

@@ -23,7 +23,8 @@ pub fn process_close_claim_status(
     unsafe {
         Config::load(program_id, config_info, false)?;
     }
-    unsafe {
+
+    let claim_status = unsafe {
         ClaimStatus::load(
             program_id,
             claim_status_info,
@@ -31,10 +32,9 @@ pub fn process_close_claim_status(
             *tip_distribution_account_info.key(),
             false,
         )?;
-    }
 
-    let claim_status =
-        unsafe { load_unchecked::<ClaimStatus>(claim_status_info.borrow_data_unchecked())? };
+        load_unchecked::<ClaimStatus>(&claim_status_info.borrow_data_unchecked()[8..])?
+    };
 
     if claim_status
         .claim_status_payer

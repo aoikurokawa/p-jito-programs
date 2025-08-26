@@ -28,10 +28,10 @@ pub fn process_initialize_merkle_root_upload_config(
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    unsafe {
+    let config = unsafe {
         Config::load(program_id, config_info, false)?;
-    }
-    let config = unsafe { load_unchecked::<Config>(config_info.borrow_data_unchecked())? };
+        load_unchecked::<Config>(&config_info.borrow_data_unchecked()[8..])?
+    };
 
     // Call the authorize function
     if config.authority.ne(authority_info.key()) {

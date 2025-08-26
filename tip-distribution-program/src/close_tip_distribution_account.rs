@@ -25,12 +25,12 @@ pub fn process_close_tip_distribution_account(
 
     let current_epoch = Clock::get()?.epoch;
 
-    unsafe {
+    let config = unsafe {
         Config::load(program_id, config_info, false)?;
-    }
-    let config = unsafe { load_mut_unchecked::<Config>(config_info.borrow_mut_data_unchecked())? };
+        load_mut_unchecked::<Config>(&mut config_info.borrow_mut_data_unchecked()[8..])?
+    };
 
-    unsafe {
+    let tip_distribution_account = unsafe {
         TipDistributionAccount::load(
             program_id,
             tip_distribution_account_info,
@@ -38,10 +38,8 @@ pub fn process_close_tip_distribution_account(
             current_epoch,
             false,
         )?;
-    }
-    let tip_distribution_account = unsafe {
         load_mut_unchecked::<TipDistributionAccount>(
-            tip_distribution_account_info.borrow_mut_data_unchecked(),
+            &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
     };
 
