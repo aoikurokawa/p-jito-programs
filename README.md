@@ -14,15 +14,23 @@ Reimplement Jito Programs by Pinocchio
 | -------------------- | -------------------- | ------------------ |
 | `Initialize`         | 37232                |                    |
 | `ChangeTipReceiver`  | 904                  | 30055              |
-| `ChangeBlockBuilder` |                      | 28654              |
+| `ChangeBlockBuilder` | 707                  | 28654              |
 
 ### Tip Distribution Program
 
-| Instruction          | CU (p-jito-programs) | CU (jito-programs) |
-| -------------------- | -------------------- | ------------------ |
-| `Initialize`                       |                      |                    |
-| `InitializeMerkleRootUploadConfig` |                      |               |
-| `InitializeTipDistributionAccount` |                      |               |
+| Instruction                           | CU (p-jito-programs) | CU (jito-programs) |
+| ------------------------------------- | -------------------- | ------------------ |
+| `Initialize`                          |                      |                    |
+| `InitializeMerkleRootUploadConfig`    |                      |               |
+| `InitializeTipDistributionAccount`    |                      |               |
+| `UpdateConfig` |                      |               |
+| `UploadMerkleRoot`                    |                      |               |
+| `CloseClaimStatus`                    |                      |               |
+| `CloseTipDistributionAccount`         |                      |               |
+| `Claim`                               |                      |               |
+| `InitializeMerkleRootUploadConfig`    |                      |               |
+| `UpdateMerkleRootUploadConfig`        |                      |               |
+| `MigrateTdaMerkleRootUploadAuthority` |                      |               |
 
 ## Instructions
 
