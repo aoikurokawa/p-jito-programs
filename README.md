@@ -2,7 +2,27 @@
 
 ## Overview
 
+Reimplement Jito Programs by Pinocchio
+
 ## Features
+
+## Compute Units
+
+### Tip Payment Program
+
+| Instruction          | CU (p-jito-programs) | CU (jito-programs) |
+| -------------------- | -------------------- | ------------------ |
+| `Initialize`         | 37232                |                    |
+| `ChangeTipReceiver`  | 904                  | 30055              |
+| `ChangeBlockBuilder` |                      | 28654              |
+
+### Tip Distribution Program
+
+| Instruction          | CU (p-jito-programs) | CU (jito-programs) |
+| -------------------- | -------------------- | ------------------ |
+| `Initialize`                       |                      |                    |
+| `InitializeMerkleRootUploadConfig` |                      |               |
+| `InitializeTipDistributionAccount` |                      |               |
 
 ## Instructions
 

@@ -1,3 +1,4 @@
+use jito_tip_core::loader::{load_signer, load_system_account, load_system_program};
 use jito_tip_payment_core::{
     config::Config, init_bumps::InitBumps, load_mut_unchecked,
     tip_payment_account::TipPaymentAccount, Transmutable,
@@ -21,11 +22,25 @@ pub fn process_initialize(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
 ) -> Result<(), ProgramError> {
-    let [config, tip_payment_account_0, tip_payment_account_1, tip_payment_account_2, tip_payment_account_3, tip_payment_account_4, tip_payment_account_5, tip_payment_account_6, tip_payment_account_7, payer, system_program] =
+    let [config, tip_payment_account_0, tip_payment_account_1, tip_payment_account_2, tip_payment_account_3, tip_payment_account_4, tip_payment_account_5, tip_payment_account_6, tip_payment_account_7, system_program, payer] =
         accounts
     else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
+
+    unsafe {
+        load_system_account(config, true)?;
+        load_system_account(tip_payment_account_0, true)?;
+        load_system_account(tip_payment_account_1, true)?;
+        load_system_account(tip_payment_account_2, true)?;
+        load_system_account(tip_payment_account_3, true)?;
+        load_system_account(tip_payment_account_4, true)?;
+        load_system_account(tip_payment_account_5, true)?;
+        load_system_account(tip_payment_account_6, true)?;
+        load_system_account(tip_payment_account_7, true)?;
+    }
+    load_system_program(system_program)?;
+    load_signer(payer, true)?;
 
     let rent = Rent::get()?;
 

@@ -2281,6 +2281,7 @@ dependencies = [
 name = "jito-tip-payment-program"
 version = "0.0.1"
 dependencies = [
+ "jito-tip-core",
  "jito-tip-payment-core",
  "jito-tip-payment-sdk",
  "litesvm",

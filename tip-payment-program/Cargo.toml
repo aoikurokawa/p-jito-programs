@@ -8,6 +8,7 @@ crate-type = ["lib", "cdylib"]
 name = "jito_tip_payment_program"
 
 [dependencies]
+jito-tip-core = { workspace = true }
 jito-tip-payment-core = { workspace = true }
 jito-tip-payment-sdk = { workspace = true }
 pinocchio = { workspace = true }
