@@ -79,9 +79,10 @@ pub fn process_initialize_merkle_root_upload_config(
     )?;
 
     let merkle_root_upload_config = unsafe {
-        load_mut_unchecked::<MerkleRootUploadConfig>(
-            merkle_root_upload_config_info.borrow_mut_data_unchecked(),
-        )?
+        let merkle_root_upload_config_data =
+            merkle_root_upload_config_info.borrow_mut_data_unchecked();
+        merkle_root_upload_config_data[0..8].copy_from_slice(MerkleRootUploadConfig::DISCRIMINATOR);
+        load_mut_unchecked::<MerkleRootUploadConfig>(&mut merkle_root_upload_config_data[8..])?
     };
 
     // Set the bump and override authority

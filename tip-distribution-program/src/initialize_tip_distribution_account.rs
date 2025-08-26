@@ -88,9 +88,10 @@ pub fn process_initialize_tip_distribution_account(
     )?;
 
     let tip_distribution_account = unsafe {
-        load_mut_unchecked::<TipDistributionAccount>(
-            tip_distribution_account_info.borrow_mut_data_unchecked(),
-        )?
+        let tip_distribution_account_data =
+            tip_distribution_account_info.borrow_mut_data_unchecked();
+        tip_distribution_account_data[0..8].copy_from_slice(TipDistributionAccount::DISCRIMINATOR);
+        load_mut_unchecked::<TipDistributionAccount>(&mut tip_distribution_account_data[8..])?
     };
 
     tip_distribution_account.validator_vote_account = *validator_vote_account_info.key();
