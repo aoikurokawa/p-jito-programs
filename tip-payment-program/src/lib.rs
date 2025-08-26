@@ -21,7 +21,8 @@ mod initialize;
 entrypoint!(process_instruction);
 // nostd_panic_handler!();
 
-pinocchio_pubkey::declare_id!("T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt");
+// pinocchio_pubkey::declare_id!("T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt");
+pinocchio_pubkey::declare_id!("3YsnULkzMZ3pJcN1zX2uSyDRdY1RKKhiC32QvhPoUJ3c");
 
 /// We've decided to hardcode the seeds, effectively meaning the following PDAs owned by this program are singleton.
 ///
