@@ -63,25 +63,28 @@ pub fn process_claim(
         .checked_add(ClaimStatus::LEN)
         .ok_or(TipDistributionError::ArithmeticError)?;
 
-    let (claim_status_pubkey, claim_status_bump, mut claim_status_seed) =
-        ClaimStatus::find_program_address(
-            program_id,
-            *claimant_info.key(),
-            *tip_distribution_account_info.key(),
-        );
-    claim_status_seed.push([claim_status_bump]);
+    let (claim_status_pubkey, claim_status_bump) = ClaimStatus::find_program_address(
+        program_id,
+        claimant_info.key(),
+        tip_distribution_account_info.key(),
+    );
 
     if claim_status_pubkey.ne(claim_status_info.key()) {
         log!("ClaimStatus account is not at the correct PDA");
         return Err(ProgramError::InvalidAccountData);
     }
 
-    let seeds: Vec<Seed> = claim_status_seed
-        .iter()
-        .map(|seed| Seed::from(seed.as_slice()))
-        .collect();
+    let claim_status_bump_slice = [claim_status_bump];
 
-    let signers = [Signer::from(seeds.as_slice())];
+    // Create the seeds for the PDA
+    let claim_status_seeds = [
+        Seed::from(b"CLAIM_STATUS".as_slice()),
+        Seed::from(claimant_info.key().as_ref()),
+        Seed::from(tip_distribution_account_info.key().as_ref()),
+        Seed::from(claim_status_bump_slice.as_slice()),
+    ];
+
+    let signers = [Signer::from(claim_status_seeds.as_slice())];
 
     log!("Initializing ClaimStatus at address {}", config_info.key());
     create_account(
@@ -126,7 +129,7 @@ pub fn process_claim(
             .to_bytes(),
     ]);
 
-    if !verify(proof, merkle_root.root, node.to_bytes()) {
+    if !verify(&proof, merkle_root.root, node.to_bytes()) {
         return Err(TipDistributionError::InvalidProof.into());
     }
 

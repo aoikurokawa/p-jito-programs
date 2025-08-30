@@ -47,29 +47,29 @@ pub fn process_initialize_merkle_root_upload_config(
         .checked_add(MerkleRootUploadConfig::LEN)
         .ok_or(TipDistributionError::ArithmeticError)?;
 
-    let (
-        merkle_root_upload_config_pubkey,
-        merkle_root_upload_config_bump,
-        mut merkle_root_upload_config_seed,
-    ) = MerkleRootUploadConfig::find_program_address(program_id);
-    merkle_root_upload_config_seed.push([merkle_root_upload_config_bump]);
+    let (merkle_root_upload_config_pubkey, merkle_root_upload_config_bump) =
+        MerkleRootUploadConfig::find_program_address(program_id);
 
     if merkle_root_upload_config_pubkey.ne(merkle_root_upload_config_info.key()) {
         log!("MerkleRootUploadConfig account is not at the correct PDA");
         return Err(ProgramError::InvalidAccountData);
     }
 
-    let seeds: Vec<Seed> = merkle_root_upload_config_seed
-        .iter()
-        .map(|seed| Seed::from(seed.as_slice()))
-        .collect();
+    let merkle_root_upload_config_bump_slice = [merkle_root_upload_config_bump];
 
-    let signers = [Signer::from(seeds.as_slice())];
+    // Create the seeds for the PDA (assuming MerkleRootUploadConfig uses similar seed structure)
+    let merkle_root_upload_config_seeds = [
+        Seed::from(b"MERKLE_ROOT_UPLOAD_CONFIG".as_slice()), // Adjust this based on actual seed
+        Seed::from(merkle_root_upload_config_bump_slice.as_slice()),
+    ];
+
+    let signers = [Signer::from(merkle_root_upload_config_seeds.as_slice())];
 
     log!(
         "Initializing MerkleRootUploadConfig at address {}",
         merkle_root_upload_config_info.key()
     );
+
     create_account(
         payer_info,
         merkle_root_upload_config_info,

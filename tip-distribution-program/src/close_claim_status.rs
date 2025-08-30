@@ -28,8 +28,8 @@ pub fn process_close_claim_status(
         ClaimStatus::load(
             program_id,
             claim_status_info,
-            *claimant_info.key(),
-            *tip_distribution_account_info.key(),
+            claimant_info.key(),
+            tip_distribution_account_info.key(),
             false,
         )?;
 

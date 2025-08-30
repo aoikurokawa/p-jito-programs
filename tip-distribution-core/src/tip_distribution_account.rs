@@ -119,25 +119,29 @@ impl TipDistributionAccount {
         Ok(())
     }
 
-    /// Returns the seeds for the PDA
-    pub fn seeds(validator_vote_account: &Pubkey, epoch: u64) -> Vec<Vec<u8>> {
-        vec![
-            b"TIP_DISTRIBUTION_ACCOUNT".to_vec(),
-            validator_vote_account.to_vec(),
-            epoch.to_le_bytes().to_vec(),
-        ]
-    }
+    // Returns the seeds for the PDA
+    // pub fn seeds(validator_vote_account: &Pubkey, epoch: u64) -> Vec<Vec<u8>> {
+    //     vec![
+    //         b"TIP_DISTRIBUTION_ACCOUNT".to_vec(),
+    //         validator_vote_account.to_vec(),
+    //         epoch.to_le_bytes().to_vec(),
+    //     ]
+    // }
 
     /// Find the program address for the PDA
     pub fn find_program_address(
         program_id: &Pubkey,
         validator_vote_account: &Pubkey,
         epoch: u64,
-    ) -> (Pubkey, u8, Vec<Vec<u8>>) {
-        let seeds = Self::seeds(validator_vote_account, epoch);
-        let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
-        let (pda, bump) = find_program_address(&seeds_iter, program_id);
-        (pda, bump, seeds)
+    ) -> (Pubkey, u8) {
+        let epoch_bytes = epoch.to_le_bytes();
+        let seeds = [
+            b"TIP_DISTRIBUTION_ACCOUNT".as_slice(),
+            validator_vote_account.as_ref(),
+            epoch_bytes.as_ref(),
+        ];
+
+        find_program_address(&seeds, program_id)
     }
 
     /// Attempts to load the account as [`TipDistributionAccount`], returning an error if it's not valid.
