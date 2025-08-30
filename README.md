@@ -21,16 +21,15 @@ Reimplement Jito Programs by Pinocchio
 | Instruction                           | CU (p-jito-programs) | CU (jito-programs) |
 | ------------------------------------- | -------------------- | ------------------ |
 | `Initialize`                          | 9894                 |                    |
-| `InitializeMerkleRootUploadConfig`    |                      |               |
 | `InitializeTipDistributionAccount`    | 12710                | 11090              |
-| `UpdateConfig` |                      |               |
-| `UploadMerkleRoot`                    |                      |               |
-| `CloseClaimStatus`                    |                      |               |
-| `CloseTipDistributionAccount`         |                      |               |
-| `Claim`                               |                      |               |
-| `InitializeMerkleRootUploadConfig`    | 11531                |               |
-| `UpdateMerkleRootUploadConfig`        |                      |               |
-| `MigrateTdaMerkleRootUploadAuthority` |                      |               |
+| `InitializeMerkleRootUploadConfig`    | 11531                |                    |
+| `UpdateConfig`                        |                      |                    |
+| `UploadMerkleRoot`                    |                      |                    |
+| `CloseClaimStatus`                    |                      |                    |
+| `CloseTipDistributionAccount`         |                      |                    |
+| `Claim`                               |                      |                    |
+| `UpdateMerkleRootUploadConfig`        | 6869                 |                    |
+| `MigrateTdaMerkleRootUploadAuthority` | 2006                 |                    |
 
 ## Instructions
 

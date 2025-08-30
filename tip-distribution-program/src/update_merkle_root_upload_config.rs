@@ -29,11 +29,11 @@ pub fn process_update_merkle_root_upload_config(
         return Err(TipDistributionError::Unauthorized.into());
     }
 
-    load_signer(merkle_root_upload_config_info, false)?;
+    load_signer(authority_info, false)?;
     load_system_program(system_program_info)?;
 
     let merkle_root_upload_config = unsafe {
-        MerkleRootUploadConfig::load(program_id, config_info, true)?;
+        MerkleRootUploadConfig::load(program_id, merkle_root_upload_config_info, true)?;
         load_mut_unchecked::<MerkleRootUploadConfig>(
             &mut merkle_root_upload_config_info.borrow_mut_data_unchecked()[8..],
         )?

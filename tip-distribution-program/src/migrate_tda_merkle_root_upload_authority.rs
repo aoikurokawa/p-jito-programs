@@ -3,34 +3,17 @@ use jito_tip_distribution_core::{
     tip_distribution_account::TipDistributionAccount,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
-use pinocchio::{
-    account_info::AccountInfo,
-    program_error::ProgramError,
-    pubkey::Pubkey,
-    sysvars::{clock::Clock, Sysvar},
-};
+use pinocchio::{account_info::AccountInfo, program_error::ProgramError, pubkey::Pubkey};
 
 pub fn process_migrate_tda_merkle_root_upload_authority(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
 ) -> Result<(), ProgramError> {
-    let [tip_distribution_account_info, merkle_root_upload_config_info, validator_vote_account_info] =
-        accounts
-    else {
+    let [tip_distribution_account_info, merkle_root_upload_config_info] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
-    let current_epoch = Clock::get()?.epoch;
-
     let tip_distribution_account = unsafe {
-        TipDistributionAccount::load(
-            program_id,
-            tip_distribution_account_info,
-            validator_vote_account_info.key(),
-            current_epoch,
-            true,
-        )?;
-
         load_mut_unchecked::<TipDistributionAccount>(
             &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
