@@ -22,7 +22,7 @@ Reimplement Jito Programs by Pinocchio
 | ------------------------------------- | -------------------- | ------------------ |
 | `Initialize`                          | 9894                 |                    |
 | `InitializeMerkleRootUploadConfig`    |                      |               |
-| `InitializeTipDistributionAccount`    |                      |               |
+| `InitializeTipDistributionAccount`    | 13553                | 11090              |
 | `UpdateConfig` |                      |               |
 | `UploadMerkleRoot`                    |                      |               |
 | `CloseClaimStatus`                    |                      |               |
