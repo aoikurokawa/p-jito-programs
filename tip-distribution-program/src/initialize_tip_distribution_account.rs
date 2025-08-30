@@ -68,7 +68,7 @@ pub fn process_initialize_tip_distribution_account(
         validator_vote_account_info.key(),
         current_epoch,
     );
-    tip_distribution_account_seed.push(vec![tip_distribution_account_bump]);
+    tip_distribution_account_seed.push([tip_distribution_account_bump]);
 
     if tip_distribution_account_pubkey.ne(tip_distribution_account_info.key()) {
         log!("TipDistributionAccount account is not at the correct PDA");

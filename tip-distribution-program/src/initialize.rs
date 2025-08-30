@@ -36,7 +36,7 @@ pub fn process_initialize(
         .ok_or(TipDistributionError::ArithmeticError)?;
 
     let (config_pubkey, config_bump, mut config_seed) = Config::find_program_address(program_id);
-    config_seed.push(vec![config_bump]);
+    config_seed.push([config_bump]);
 
     if config_pubkey.ne(config_info.key()) {
         log!("Config account is not at the correct PDA");

@@ -21,7 +21,7 @@ pub fn process_claim(
     accounts: &[AccountInfo],
     bump: u8,
     amount: u64,
-    proof: Vec<[u8; 32]>,
+    proof: [[u8; 32]; 32],
 ) -> Result<(), ProgramError> {
     let [config_info, tip_distribution_account_info, merkle_root_upload_authority_info, claim_status_info, claimant_info, payer_info, system_program_info, validator_vote_account_info] =
         accounts
@@ -69,7 +69,7 @@ pub fn process_claim(
             *claimant_info.key(),
             *tip_distribution_account_info.key(),
         );
-    claim_status_seed.push(vec![claim_status_bump]);
+    claim_status_seed.push([claim_status_bump]);
 
     if claim_status_pubkey.ne(claim_status_info.key()) {
         log!("ClaimStatus account is not at the correct PDA");

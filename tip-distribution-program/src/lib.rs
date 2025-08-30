@@ -1,3 +1,5 @@
+#![no_std]
+
 use jito_tip_distribution_sdk::instruction::JitoTipDistributionInstruction;
 use pinocchio::{
     account_info::AccountInfo, entrypoint, msg, program_error::ProgramError, pubkey::Pubkey,

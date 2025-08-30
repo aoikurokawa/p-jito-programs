@@ -22,7 +22,7 @@ pub struct Config {
 
 unsafe impl Transmutable for Config {
     // header, fields, and InitBumps
-    const LEN: usize = std::mem::size_of::<Self>();
+    const LEN: usize = core::mem::size_of::<Self>();
 }
 
 impl Config {
@@ -40,8 +40,8 @@ impl Config {
         }
     }
 
-    pub fn seeds() -> Vec<Vec<u8>> {
-        vec![b"CONFIG_ACCOUNT".to_vec()]
+    pub fn seeds() -> &'static [&'static [u8]] {
+        &[b"CONFIG_ACCOUNT"]
     }
 
     /// Find the program address for the global configuration account
@@ -52,10 +52,9 @@ impl Config {
     /// * `Pubkey` - The program address
     /// * `u8` - The bump seed
     /// * `Vec<Vec<u8>>` - The seeds used to generate the PDA
-    pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8, Vec<Vec<u8>>) {
+    pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8) {
         let seeds = Self::seeds();
-        let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
-        let (pda, bump) = find_program_address(&seeds_iter, program_id);
-        (pda, bump, seeds)
+        let (pda, bump) = find_program_address(seeds, program_id);
+        (pda, bump)
     }
 }

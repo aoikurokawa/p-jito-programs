@@ -52,7 +52,7 @@ pub fn process_initialize_merkle_root_upload_config(
         merkle_root_upload_config_bump,
         mut merkle_root_upload_config_seed,
     ) = MerkleRootUploadConfig::find_program_address(program_id);
-    merkle_root_upload_config_seed.push(vec![merkle_root_upload_config_bump]);
+    merkle_root_upload_config_seed.push([merkle_root_upload_config_bump]);
 
     if merkle_root_upload_config_pubkey.ne(merkle_root_upload_config_info.key()) {
         log!("MerkleRootUploadConfig account is not at the correct PDA");
