@@ -23,8 +23,7 @@ pub fn process_upload_merkle_root(
     max_total_claim: u64,
     max_num_nodes: u64,
 ) -> Result<(), ProgramError> {
-    let [config_info, tip_distribution_account_info, merkle_root_upload_authority_info, validator_vote_account_info] =
-        accounts
+    let [config_info, tip_distribution_account_info, merkle_root_upload_authority_info] = accounts
     else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
@@ -32,19 +31,12 @@ pub fn process_upload_merkle_root(
     let current_epoch = Clock::get()?.epoch;
 
     unsafe {
-        Config::load(program_id, config_info, true)?;
+        Config::load(program_id, config_info, false)?;
     }
 
     load_signer(merkle_root_upload_authority_info, false)?;
 
     let tip_distribution_account = unsafe {
-        TipDistributionAccount::load(
-            program_id,
-            tip_distribution_account_info,
-            validator_vote_account_info.key(),
-            current_epoch,
-            true,
-        )?;
         load_mut_unchecked::<TipDistributionAccount>(
             &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
