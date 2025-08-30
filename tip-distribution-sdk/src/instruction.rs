@@ -187,10 +187,10 @@ impl JitoTipDistributionInstruction {
                 root.copy_from_slice(&remaining[0..32]);
 
                 let mut max_total_claim = [0; 8];
-                max_total_claim.copy_from_slice(&remaining[32..36]);
+                max_total_claim.copy_from_slice(&remaining[32..40]);
 
                 let mut max_num_nodes = [0; 8];
-                max_num_nodes.copy_from_slice(&remaining[36..44]);
+                max_num_nodes.copy_from_slice(&remaining[40..48]);
 
                 Ok(Self::UploadMerkleRoot {
                     root,

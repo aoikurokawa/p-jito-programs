@@ -48,6 +48,24 @@ impl TipDistributionAccount {
     pub const SIZE: usize = 8 + size_of::<Self>();
     pub const DISCRIMINATOR: &'static [u8] = &[85, 64, 113, 198, 234, 94, 120, 123];
 
+    pub fn new(
+        validator_vote_account: Pubkey,
+        current_epoch: u64,
+        validator_commission_bps: u16,
+        merkle_root_upload_authority: Pubkey,
+        bump: u8,
+    ) -> Self {
+        Self {
+            validator_vote_account,
+            epoch_created_at: current_epoch,
+            validator_commission_bps: validator_commission_bps,
+            merkle_root_upload_authority: merkle_root_upload_authority,
+            merkle_root: None,
+            expires_at: current_epoch,
+            bump,
+        }
+    }
+
     pub fn validate(&self) -> Result<(), TipDistributionError> {
         let default_pubkey = Pubkey::default();
         if self.validator_vote_account == default_pubkey
