@@ -48,24 +48,7 @@ impl TipDistributionAccount {
     pub const SIZE: usize = 8 + size_of::<Self>();
     pub const DISCRIMINATOR: &'static [u8] = &[85, 64, 113, 198, 234, 94, 120, 123];
 
-    pub const fn new(
-        validator_vote_account: Pubkey,
-        current_epoch: u64,
-        validator_commission_bps: u16,
-        merkle_root_upload_authority: Pubkey,
-        bump: u8,
-    ) -> Self {
-        Self {
-            validator_vote_account,
-            epoch_created_at: current_epoch,
-            validator_commission_bps,
-            merkle_root_upload_authority,
-            merkle_root: None,
-            expires_at: current_epoch,
-            bump,
-        }
-    }
-
+    #[inline(always)]
     pub fn validate(&self) -> Result<(), TipDistributionError> {
         let default_pubkey = Pubkey::default();
         if self.validator_vote_account == default_pubkey
@@ -77,6 +60,7 @@ impl TipDistributionAccount {
         Ok(())
     }
 
+    #[inline(always)]
     pub fn claim_expired(from: &AccountInfo, to: &AccountInfo) -> Result<u64, ProgramError> {
         let rent = Rent::get()?;
         let min_rent_lamports = rent.minimum_balance(from.data_len());
@@ -90,10 +74,12 @@ impl TipDistributionAccount {
         Ok(amount)
     }
 
+    #[inline(always)]
     pub fn claim(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<(), ProgramError> {
         Self::transfer_lamports(from, to, amount)
     }
 
+    #[inline(always)]
     fn transfer_lamports(
         from: &AccountInfo,
         to: &AccountInfo,
@@ -129,6 +115,7 @@ impl TipDistributionAccount {
     // }
 
     /// Find the program address for the PDA
+    #[inline(always)]
     pub fn find_program_address(
         program_id: &Pubkey,
         validator_vote_account: &Pubkey,
@@ -147,6 +134,7 @@ impl TipDistributionAccount {
     /// Attempts to load the account as [`TipDistributionAccount`], returning an error if it's not valid.
     ///
     /// # Safety
+    #[inline(always)]
     pub unsafe fn load(
         program_id: &Pubkey,
         tip_distribution_account: &AccountInfo,

@@ -106,13 +106,13 @@ pub fn process_initialize_tip_distribution_account(
         load_mut_unchecked::<TipDistributionAccount>(&mut tip_distribution_account_data[8..])?
     };
 
-    *tip_distribution_account = TipDistributionAccount::new(
-        *validator_vote_account_info.key(),
-        current_epoch,
-        validator_commission_bps,
-        merkle_root_upload_authority,
-        bump,
-    );
+    tip_distribution_account.validator_vote_account = *validator_vote_account_info.key();
+    tip_distribution_account.epoch_created_at = current_epoch;
+    tip_distribution_account.validator_commission_bps = validator_commission_bps;
+    tip_distribution_account.merkle_root_upload_authority = merkle_root_upload_authority;
+    tip_distribution_account.merkle_root = None;
+    tip_distribution_account.expires_at = current_epoch;
+    tip_distribution_account.bump = bump;
 
     tip_distribution_account.validate()?;
 

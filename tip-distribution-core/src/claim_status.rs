@@ -43,6 +43,7 @@ impl ClaimStatus {
     pub const DISCRIMINATOR: &'static [u8] = &[22, 183, 249, 157, 247, 95, 150, 96];
 
     /// Find the program address for the PDA
+    #[inline(always)]
     pub fn find_program_address(
         program_id: &Pubkey,
         claimant: &Pubkey,
@@ -60,6 +61,7 @@ impl ClaimStatus {
     /// Attempts to load the account as [`ClaimStatus`], returning an error if it's not valid.
     ///
     /// # Safety
+    #[inline(always)]
     pub unsafe fn load(
         program_id: &Pubkey,
         claim_status: &AccountInfo,

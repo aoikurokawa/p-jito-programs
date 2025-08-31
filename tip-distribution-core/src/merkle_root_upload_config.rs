@@ -43,6 +43,7 @@ impl MerkleRootUploadConfig {
     /// * `Pubkey` - The program address
     /// * `u8` - The bump seed
     /// * `Vec<Vec<u8>>` - The seeds used to generate the PDA
+    #[inline(always)]
     pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8) {
         // let seeds = Self::seeds();
         // let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
@@ -62,6 +63,7 @@ impl MerkleRootUploadConfig {
     /// * `Result<(), ProgramError>` - The result of the operation
     ///
     /// # Safety
+    #[inline(always)]
     pub unsafe fn load(
         program_id: &Pubkey,
         account: &AccountInfo,
