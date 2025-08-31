@@ -107,7 +107,8 @@ pub fn process_initialize_tip_distribution_account(
         validator_commission_bps,
         merkle_root_upload_authority,
         bump,
-    );
+        cfg.num_epochs_valid,
+    )?;
 
     tip_distribution_account.validate()?;
 

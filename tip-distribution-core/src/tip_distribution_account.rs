@@ -48,22 +48,27 @@ impl TipDistributionAccount {
     pub const DISCRIMINATOR: &'static [u8] = &[85, 64, 113, 198, 234, 94, 120, 123];
 
     #[inline(always)]
-    pub const fn new(
+    pub fn new(
         validator_vote_account: Pubkey,
         current_epoch: u64,
         validator_commission_bps: u16,
         merkle_root_upload_authority: Pubkey,
         bump: u8,
-    ) -> Self {
-        Self {
+        num_epochs_valid: u64,
+    ) -> Result<Self, TipDistributionError> {
+        let expires_at = current_epoch
+            .checked_add(num_epochs_valid)
+            .ok_or(TipDistributionError::ArithmeticError)?;
+
+        Ok(Self {
             validator_vote_account,
             epoch_created_at: current_epoch,
             validator_commission_bps,
             merkle_root_upload_authority,
             merkle_root: None,
-            expires_at: current_epoch,
+            expires_at,
             bump,
-        }
+        })
     }
 
     #[inline(always)]
