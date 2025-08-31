@@ -42,13 +42,12 @@ pub enum JitoTipDistributionInstruction {
     /// Close claim status
     CloseTipDistributionAccount,
 
-    /// Claim
-    Claim {
-        bump: u8,
-        amount: u64,
-        proof: [[u8; 32]; MAX_PROOF_SIZE],
-    },
-
+    // Claim
+    // Claim {
+    //     bump: u8,
+    //     amount: u64,
+    //     proof: [[u8; 32]; MAX_PROOF_SIZE],
+    // },
     /// Initialize merkle root upload config
     InitializeMerkleRootUploadConfig {
         authority: Pubkey,
@@ -168,35 +167,35 @@ impl JitoTipDistributionInstruction {
             [47, 136, 208, 190, 125, 243, 74, 227] => Ok(Self::CloseTipDistributionAccount),
 
             // Claim
-            [62, 198, 214, 193, 213, 159, 108, 210] => {
-                let bump = remaining[0];
+            // [62, 198, 214, 193, 213, 159, 108, 210] => {
+            //     let bump = remaining[0];
 
-                let mut amount = [0; 8];
-                amount.copy_from_slice(&remaining[1..9]);
+            //     let mut amount = [0; 8];
+            //     amount.copy_from_slice(&remaining[1..9]);
 
-                let mut proof_len_bytes = [0; 4];
-                proof_len_bytes.copy_from_slice(&remaining[9..13]);
-                let proof_len = u32::from_le_bytes(proof_len_bytes) as usize;
+            //     let mut proof_len_bytes = [0; 4];
+            //     proof_len_bytes.copy_from_slice(&remaining[9..13]);
+            //     let proof_len = u32::from_le_bytes(proof_len_bytes) as usize;
 
-                // Check if we have enough bytes for all proof elements
-                let expected_bytes = 13 + (proof_len * 32);
-                if remaining.len() < expected_bytes {
-                    return Err(ProgramError::InvalidInstructionData);
-                }
+            //     // Check if we have enough bytes for all proof elements
+            //     let expected_bytes = 13 + (proof_len * 32);
+            //     if remaining.len() < expected_bytes {
+            //         return Err(ProgramError::InvalidInstructionData);
+            //     }
 
-                let mut proof = [[0u8; 32]; MAX_PROOF_SIZE];
-                for i in 0..proof_len {
-                    let start_idx = 13 + (i * 32); // Start after discriminator + bump + amount + proof_len
-                    let end_idx = start_idx + 32;
-                    proof[i].copy_from_slice(&remaining[start_idx..end_idx]);
-                }
+            //     let mut proof = [[0u8; 32]; MAX_PROOF_SIZE];
+            //     for i in 0..proof_len {
+            //         let start_idx = 13 + (i * 32); // Start after discriminator + bump + amount + proof_len
+            //         let end_idx = start_idx + 32;
+            //         proof[i].copy_from_slice(&remaining[start_idx..end_idx]);
+            //     }
 
-                Ok(Self::Claim {
-                    bump,
-                    amount: u64::from_le_bytes(amount),
-                    proof,
-                })
-            }
+            //     Ok(Self::Claim {
+            //         bump,
+            //         amount: u64::from_le_bytes(amount),
+            //         proof,
+            //     })
+            // }
 
             // Initialize merkle root upload config
             [232, 87, 72, 14, 89, 40, 40, 27] => {
