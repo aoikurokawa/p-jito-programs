@@ -28,19 +28,25 @@ pub fn process_upload_merkle_root(
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    pinocchio_log::log!("Hello 1");
+
     let current_epoch = Clock::get()?.epoch;
 
+    pinocchio_log::log!("Hello 2");
     unsafe {
         Config::load(program_id, config_info, false)?;
     }
+    pinocchio_log::log!("Hello 3");
 
     load_signer(merkle_root_upload_authority_info, false)?;
+    pinocchio_log::log!("Hello 4");
 
     let tip_distribution_account = unsafe {
         load_mut_unchecked::<TipDistributionAccount>(
             &mut tip_distribution_account_info.borrow_mut_data_unchecked()[8..],
         )?
     };
+    pinocchio_log::log!("Hello 5");
 
     if tip_distribution_account
         .merkle_root_upload_authority
@@ -48,6 +54,7 @@ pub fn process_upload_merkle_root(
     {
         return Err(TipDistributionError::Unauthorized.into());
     }
+    pinocchio_log::log!("Hello 7");
 
     if let Some(merkle_root) = tip_distribution_account.merkle_root {
         if merkle_root.num_nodes_claimed > 0 {
@@ -55,13 +62,24 @@ pub fn process_upload_merkle_root(
         }
     }
 
+    pinocchio_log::log!(
+        "Tip distribution created at: {}",
+        tip_distribution_account.epoch_created_at
+    );
+
     if current_epoch <= tip_distribution_account.epoch_created_at {
         return Err(TipDistributionError::PrematureMerkleRootUpload.into());
     }
 
+    pinocchio_log::log!(
+        "Tip distribution expired at: {}",
+        tip_distribution_account.expires_at
+    );
+
     if current_epoch > tip_distribution_account.expires_at {
         return Err(TipDistributionError::ExpiredTipDistributionAccount.into());
     }
+    pinocchio_log::log!("Hello 8");
 
     tip_distribution_account.merkle_root = Some(MerkleRoot {
         root,
@@ -70,8 +88,10 @@ pub fn process_upload_merkle_root(
         total_funds_claimed: 0,
         num_nodes_claimed: 0,
     });
+    pinocchio_log::log!("Hello 9");
 
     tip_distribution_account.validate()?;
+    pinocchio_log::log!("Hello 10");
 
     Ok(())
 }

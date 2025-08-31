@@ -1,8 +1,6 @@
 [workspace]
 members = [
-    "clients/rust",
     "core",
-    "shank-cli",
     "tip-distribution-core",
     "tip-distribution-program",
     "tip-distribution-sdk",
