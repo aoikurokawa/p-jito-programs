@@ -40,7 +40,7 @@ impl Config {
         }
     }
 
-    pub fn seeds() -> &'static [&'static [u8]] {
+    pub const fn seeds() -> &'static [&'static [u8]] {
         &[b"CONFIG_ACCOUNT"]
     }
 

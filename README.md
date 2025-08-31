@@ -21,7 +21,7 @@ Reimplement Jito Programs by Pinocchio
 | Instruction                           | CU (p-jito-programs) | CU (jito-programs) |
 | ------------------------------------- | -------------------- | ------------------ |
 | `Initialize`                          | 9894                 |                    |
-| `InitializeTipDistributionAccount`    | 12710                | 11090              |
+| `InitializeTipDistributionAccount`    | 8395                 | 11090              |
 | `InitializeMerkleRootUploadConfig`    | 11531                |                    |
 | `UpdateConfig`                        |                      |                    |
 | `UploadMerkleRoot`                    |                      |                    |

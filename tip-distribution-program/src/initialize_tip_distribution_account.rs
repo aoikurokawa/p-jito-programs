@@ -84,11 +84,6 @@ pub fn process_initialize_tip_distribution_account(
 
     let signers = [Signer::from(tip_distribution_account_seeds.as_slice())];
 
-    log!(
-        "Initializing TipDistributionAccount at address {}",
-        tip_distribution_account_info.key()
-    );
-
     create_account(
         signer_info,
         tip_distribution_account_info,

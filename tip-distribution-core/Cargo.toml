@@ -9,7 +9,6 @@ jito-tip-distribution-sdk = { workspace = true }
 pinocchio = { workspace = true }
 pinocchio-log = { workspace = true }
 pinocchio-system = { workspace = true }
-shank = { workspace = true }
 
 [lints]
 workspace = true
