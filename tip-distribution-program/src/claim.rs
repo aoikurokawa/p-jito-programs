@@ -16,6 +16,7 @@ use pinocchio_log::log;
 use crate::verify;
 
 /// Claims tokens from the [TipDistributionAccount].
+#[allow(dead_code)]
 pub fn process_claim(
     program_id: &Pubkey,
     accounts: &[AccountInfo],

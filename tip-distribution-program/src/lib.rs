@@ -7,7 +7,7 @@ use pinocchio::{
 };
 
 use crate::{
-    claim::process_claim, close_claim_status::process_close_claim_status,
+    close_claim_status::process_close_claim_status,
     close_tip_distribution_account::process_close_tip_distribution_account,
     initialize::process_initialize,
     initialize_merkle_root_upload_config::process_initialize_merkle_root_upload_config,

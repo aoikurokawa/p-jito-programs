@@ -1,6 +1,6 @@
 use pinocchio::{program_error::ProgramError, pubkey::Pubkey};
 
-const MAX_PROOF_SIZE: usize = 32;
+// const MAX_PROOF_SIZE: usize = 32;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[repr(C)]
@@ -42,13 +42,12 @@ pub enum JitoTipDistributionInstruction {
     /// Close claim status
     CloseTipDistributionAccount,
 
-    /// Claim
+    // Claim
     // Claim {
     //     bump: u8,
     //     amount: u64,
     //     proof: [[u8; 32]; MAX_PROOF_SIZE],
     // },
-
     /// Initialize merkle root upload config
     InitializeMerkleRootUploadConfig {
         authority: Pubkey,
