@@ -38,6 +38,7 @@ pub fn process_initialize_tip_distribution_account(
         Config::load(program_id, config_info, false)?;
         load_unchecked::<Config>(&config_info.borrow_data_unchecked()[8..])?
     };
+
     if validator_commission_bps > cfg.max_validator_commission_bps {
         log!(
             "Validator commission BPS {} should be less than {}",
@@ -53,39 +54,41 @@ pub fn process_initialize_tip_distribution_account(
     // }
 
     let current_epoch = Clock::get()?.epoch;
-
     let rent = Rent::get()?;
     let space = 8usize
         .checked_add(TipDistributionAccount::LEN)
         .ok_or(TipDistributionError::ArithmeticError)?;
 
-    let (
-        tip_distribution_account_pubkey,
-        tip_distribution_account_bump,
-        mut tip_distribution_account_seed,
-    ) = TipDistributionAccount::find_program_address(
-        program_id,
-        validator_vote_account_info.key(),
-        current_epoch,
-    );
-    tip_distribution_account_seed.push(vec![tip_distribution_account_bump]);
+    let (tip_distribution_account_pubkey, tip_distribution_account_bump) =
+        TipDistributionAccount::find_program_address(
+            program_id,
+            validator_vote_account_info.key(),
+            current_epoch,
+        );
 
     if tip_distribution_account_pubkey.ne(tip_distribution_account_info.key()) {
         log!("TipDistributionAccount account is not at the correct PDA");
         return Err(ProgramError::InvalidAccountData);
     }
 
-    let seeds: Vec<Seed> = tip_distribution_account_seed
-        .iter()
-        .map(|seed| Seed::from(seed.as_slice()))
-        .collect();
+    let tip_distribution_account_bump_slice = [tip_distribution_account_bump];
 
-    let signers = [Signer::from(seeds.as_slice())];
+    // Create the seeds for the PDA
+    let current_epoch_bytes = current_epoch.to_le_bytes();
+    let tip_distribution_account_seeds = [
+        Seed::from(b"TIP_DISTRIBUTION_ACCOUNT".as_slice()),
+        Seed::from(validator_vote_account_info.key().as_ref()),
+        Seed::from(current_epoch_bytes.as_slice()),
+        Seed::from(tip_distribution_account_bump_slice.as_slice()),
+    ];
+
+    let signers = [Signer::from(tip_distribution_account_seeds.as_slice())];
 
     log!(
         "Initializing TipDistributionAccount at address {}",
         tip_distribution_account_info.key()
     );
+
     create_account(
         signer_info,
         tip_distribution_account_info,

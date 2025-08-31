@@ -36,41 +36,35 @@ pub struct ClaimStatus {
 
 unsafe impl Transmutable for ClaimStatus {
     // header, fields, and InitBumps
-    const LEN: usize = std::mem::size_of::<Self>();
+    const LEN: usize = core::mem::size_of::<Self>();
 }
 
 impl ClaimStatus {
     pub const DISCRIMINATOR: &'static [u8] = &[22, 183, 249, 157, 247, 95, 150, 96];
 
-    /// Seeds
-    pub fn seeds(claimant: Pubkey, tip_distribution_account: Pubkey) -> Vec<Vec<u8>> {
-        vec![
-            b"CLAIM_STATUS".to_vec(),
-            claimant.to_vec(),
-            tip_distribution_account.to_vec(),
-        ]
-    }
-
     /// Find the program address for the PDA
     pub fn find_program_address(
         program_id: &Pubkey,
-        claimant: Pubkey,
-        tip_distribution_account: Pubkey,
-    ) -> (Pubkey, u8, Vec<Vec<u8>>) {
-        let seeds = Self::seeds(claimant, tip_distribution_account);
-        let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
-        let (pda, bump) = find_program_address(&seeds_iter, program_id);
-        (pda, bump, seeds)
+        claimant: &Pubkey,
+        tip_distribution_account: &Pubkey,
+    ) -> (Pubkey, u8) {
+        let seeds = [
+            b"CLAIM_STATUS".as_slice(),
+            claimant.as_ref(),
+            tip_distribution_account.as_ref(),
+        ];
+
+        find_program_address(&seeds, program_id)
     }
 
-    /// Attempts to load the account as [`TipDistributionAccount`], returning an error if it's not valid.
+    /// Attempts to load the account as [`ClaimStatus`], returning an error if it's not valid.
     ///
     /// # Safety
     pub unsafe fn load(
         program_id: &Pubkey,
         claim_status: &AccountInfo,
-        claimant: Pubkey,
-        tip_distribution_account: Pubkey,
+        claimant: &Pubkey,
+        tip_distribution_account: &Pubkey,
         expect_writable: bool,
     ) -> Result<(), ProgramError> {
         if claim_status.owner().ne(program_id) {

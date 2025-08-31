@@ -1,3 +1,5 @@
+#![no_std]
+
 use pinocchio::program_error::ProgramError;
 
 pub mod config;
