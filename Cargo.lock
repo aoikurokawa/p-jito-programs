@@ -2214,7 +2214,6 @@ dependencies = [
  "pinocchio 0.9.0",
  "pinocchio-log",
  "pinocchio-system",
- "shank",
 ]
 
 [[package]]

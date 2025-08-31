@@ -5,12 +5,11 @@ use pinocchio::{
     program_error::ProgramError,
     pubkey::{find_program_address, Pubkey},
 };
-use shank::ShankAccount;
 
 use crate::Transmutable;
 
 /// Stores program config metadata.
-#[derive(Debug, Default, ShankAccount)]
+#[derive(Debug)]
 #[repr(C)]
 pub struct Config {
     /// Account with authority over this PDA.
@@ -40,6 +39,7 @@ impl Config {
     pub const DISCRIMINATOR: &'static [u8] = &[155, 12, 170, 224, 30, 250, 204, 130];
 
     /// Initialize a [`Config`]
+    #[inline(always)]
     pub const fn new(
         authority: Pubkey,
         expired_funds_account: Pubkey,
@@ -56,6 +56,7 @@ impl Config {
         }
     }
 
+    #[inline(always)]
     pub fn validate(&self) -> Result<(), TipDistributionError> {
         const MAX_NUM_EPOCHS_VALID: u64 = 10;
         const MAX_VALIDATOR_COMMISSION_BPS: u16 = 10000;
@@ -79,10 +80,6 @@ impl Config {
         Ok(())
     }
 
-    // pub fn seeds() -> Vec<Vec<u8>> {
-    //     vec![b"CONFIG_ACCOUNT".to_vec()]
-    // }
-
     /// Find the program address for the global configuration account
     ///
     /// # Arguments
@@ -91,6 +88,7 @@ impl Config {
     /// * `Pubkey` - The program address
     /// * `u8` - The bump seed
     /// * `Vec<Vec<u8>>` - The seeds used to generate the PDA
+    #[inline(always)]
     pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8) {
         // let seeds = Self::seeds();
         // let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
@@ -110,6 +108,7 @@ impl Config {
     /// * `Result<(), ProgramError>` - The result of the operation
     ///
     /// # Safety
+    #[inline(always)]
     pub unsafe fn load(
         program_id: &Pubkey,
         account: &AccountInfo,

@@ -7,12 +7,11 @@ use pinocchio::{
     sysvars::{rent::Rent, Sysvar},
 };
 use pinocchio_system::instructions::Transfer;
-use shank::ShankAccount;
 
 use crate::{merkle_root::MerkleRoot, Transmutable};
 
 /// The account that validators register as **tip_receiver** with the tip-payment program.
-#[derive(Debug, Default, ShankAccount)]
+#[derive(Debug, Default)]
 #[repr(C)]
 pub struct TipDistributionAccount {
     /// The validator's vote account, also the recipient of remaining lamports after
@@ -48,6 +47,7 @@ impl TipDistributionAccount {
     pub const SIZE: usize = 8 + size_of::<Self>();
     pub const DISCRIMINATOR: &'static [u8] = &[85, 64, 113, 198, 234, 94, 120, 123];
 
+    #[inline(always)]
     pub const fn new(
         validator_vote_account: Pubkey,
         current_epoch: u64,
@@ -66,6 +66,7 @@ impl TipDistributionAccount {
         }
     }
 
+    #[inline(always)]
     pub fn validate(&self) -> Result<(), TipDistributionError> {
         let default_pubkey = Pubkey::default();
         if self.validator_vote_account == default_pubkey
@@ -77,6 +78,7 @@ impl TipDistributionAccount {
         Ok(())
     }
 
+    #[inline(always)]
     pub fn claim_expired(from: &AccountInfo, to: &AccountInfo) -> Result<u64, ProgramError> {
         let rent = Rent::get()?;
         let min_rent_lamports = rent.minimum_balance(from.data_len());
@@ -90,10 +92,12 @@ impl TipDistributionAccount {
         Ok(amount)
     }
 
+    #[inline(always)]
     pub fn claim(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<(), ProgramError> {
         Self::transfer_lamports(from, to, amount)
     }
 
+    #[inline(always)]
     fn transfer_lamports(
         from: &AccountInfo,
         to: &AccountInfo,
@@ -119,16 +123,8 @@ impl TipDistributionAccount {
         Ok(())
     }
 
-    // Returns the seeds for the PDA
-    // pub fn seeds(validator_vote_account: &Pubkey, epoch: u64) -> Vec<Vec<u8>> {
-    //     vec![
-    //         b"TIP_DISTRIBUTION_ACCOUNT".to_vec(),
-    //         validator_vote_account.to_vec(),
-    //         epoch.to_le_bytes().to_vec(),
-    //     ]
-    // }
-
     /// Find the program address for the PDA
+    #[inline(always)]
     pub fn find_program_address(
         program_id: &Pubkey,
         validator_vote_account: &Pubkey,
@@ -147,6 +143,7 @@ impl TipDistributionAccount {
     /// Attempts to load the account as [`TipDistributionAccount`], returning an error if it's not valid.
     ///
     /// # Safety
+    #[inline(always)]
     pub unsafe fn load(
         program_id: &Pubkey,
         tip_distribution_account: &AccountInfo,

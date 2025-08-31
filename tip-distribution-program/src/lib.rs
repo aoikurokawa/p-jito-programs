@@ -110,14 +110,14 @@ fn process_instruction(
             msg!("Instruction: CloseTipDistributionAccount");
             process_close_tip_distribution_account(program_id, accounts)
         }
-        JitoTipDistributionInstruction::Claim {
-            bump,
-            amount,
-            proof,
-        } => {
-            msg!("Instruction: Claim");
-            process_claim(program_id, accounts, bump, amount, proof)
-        }
+        // JitoTipDistributionInstruction::Claim {
+        //     bump,
+        //     amount,
+        //     proof,
+        // } => {
+        //     msg!("Instruction: Claim");
+        //     process_claim(program_id, accounts, bump, amount, proof)
+        // }
         JitoTipDistributionInstruction::InitializeMerkleRootUploadConfig {
             authority,
             original_authority,

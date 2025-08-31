@@ -4,11 +4,10 @@ use pinocchio::{
     program_error::ProgramError,
     pubkey::{find_program_address, Pubkey},
 };
-use shank::ShankAccount;
 
 use crate::Transmutable;
 
-#[derive(Debug, Default, ShankAccount)]
+#[derive(Debug, Default)]
 #[repr(C)]
 pub struct MerkleRootUploadConfig {
     /// The authority that overrides the TipDistributionAccount merkle_root_upload_authority
@@ -31,10 +30,6 @@ impl MerkleRootUploadConfig {
     pub const ROOT_UPLOAD_CONFIG_SEED: &'static [u8] = b"ROOT_UPLOAD_CONFIG";
     pub const DISCRIMINATOR: &'static [u8] = &[213, 125, 30, 192, 25, 121, 87, 33];
 
-    // pub fn seeds() -> Vec<Vec<u8>> {
-    //     vec![b"ROOT_UPLOAD_CONFIG".to_vec()]
-    // }
-
     /// Find the program address for the global configuration account
     ///
     /// # Arguments
@@ -43,6 +38,7 @@ impl MerkleRootUploadConfig {
     /// * `Pubkey` - The program address
     /// * `u8` - The bump seed
     /// * `Vec<Vec<u8>>` - The seeds used to generate the PDA
+    #[inline(always)]
     pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8) {
         // let seeds = Self::seeds();
         // let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();

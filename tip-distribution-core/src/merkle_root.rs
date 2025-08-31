@@ -1,6 +1,4 @@
-use shank::ShankType;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, ShankType)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub struct MerkleRoot {
     /// The 256-bit merkle root.
