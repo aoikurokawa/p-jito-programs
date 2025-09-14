@@ -90,6 +90,13 @@ impl TipDistributionCliHandler {
                         epoch,
                     },
             } => self.get_tip_distribution_account(vote_account, epoch),
+            TipDistributionCommands::TipDistributionAccount {
+                action:
+                    TipDistributionAccountActions::Close {
+                        vote_account,
+                        epoch,
+                    },
+            } => self.close_tip_distribution_account(vote_account, epoch),
         }
     }
 
@@ -221,6 +228,43 @@ impl TipDistributionCliHandler {
                 validator_vote_account: vote_account,
                 signer: self.keypair.pubkey(),
                 system_program: system_program::ID,
+            }
+            .to_account_metas(None),
+        };
+
+        let blockhash = self.client.get_latest_blockhash()?;
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&self.keypair.pubkey()),
+            &[self.keypair.clone()],
+            blockhash,
+        );
+
+        self.client.send_transaction(&tx)?;
+
+        Ok(())
+    }
+
+    pub fn close_tip_distribution_account(
+        &self,
+        vote_account: Pubkey,
+        epoch: u64,
+    ) -> anyhow::Result<()> {
+        let (tip_distribution_pda, _tip_distribution_bump) =
+            derive_tip_distribution_account_address(&self.program_id, &vote_account, epoch);
+
+        let ix = Instruction {
+            program_id: self.program_id,
+            data: jito_tip_distribution_legacy::instruction::CloseTipDistributionAccount {
+                _epoch: epoch,
+            }
+            .data(),
+            accounts: jito_tip_distribution_legacy::accounts::CloseTipDistributionAccount {
+                config: self.config_pda,
+                expired_funds_account: self.keypair.pubkey(),
+                tip_distribution_account: tip_distribution_pda,
+                validator_vote_account: vote_account,
+                signer: self.keypair.pubkey(),
             }
             .to_account_metas(None),
         };
