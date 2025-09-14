@@ -1,8 +1,8 @@
 [package]
 name = "vote-state"
-version.workspace = true
-edition.workspace = true
-readme.workspace = true
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
 
 [dependencies]
 pinocchio = { workspace = true }
