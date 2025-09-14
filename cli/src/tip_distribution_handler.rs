@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use anchor_lang::{AccountDeserialize, InstructionData, ToAccountMetas};
-use jito_tip_distribution_legacy::state::{ClaimStatus, Config, MerkleRootUploadConfig};
-use jito_tip_distribution_sdk_legacy::derive_config_account_address;
+use jito_tip_distribution_legacy::state::Config;
 use solana_client::rpc_client::RpcClient;
 use solana_instruction::Instruction;
 use solana_keypair::Keypair;
@@ -12,27 +11,6 @@ use solana_signer::Signer;
 use solana_transaction::Transaction;
 
 use crate::tip_distribution::{ConfigActions, TipDistributionCommands};
-
-// fn derive_merkle_root_upload_config_account_address(
-//     tip_distribution_program_id: &Pubkey,
-// ) -> (Pubkey, u8) {
-//     Pubkey::find_program_address(&[MerkleRootUploadConfig::SEED], tip_distribution_program_id)
-// }
-//
-// fn derive_claim_status_account_address(
-//     tip_distribution_program_id: &Pubkey,
-//     claimant: &Pubkey,
-//     tip_distribution_account: &Pubkey,
-// ) -> (Pubkey, u8) {
-//     Pubkey::find_program_address(
-//         &[
-//             ClaimStatus::SEED,
-//             claimant.to_bytes().as_ref(),
-//             tip_distribution_account.to_bytes().as_ref(),
-//         ],
-//         tip_distribution_program_id,
-//     )
-// }
 
 pub struct TipDistributionCliHandler {
     /// RPC Client

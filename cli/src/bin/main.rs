@@ -1,45 +1,35 @@
 use std::{str::FromStr, sync::Arc};
 
-use anchor_lang::{system_program, AccountDeserialize, InstructionData, ToAccountMetas};
-use clap::{Parser, Subcommand};
+use clap::Parser;
 use jito_tip_cli::{
     cli_args::{Cli, ProgramCommand},
-    tip_distribution::TipDistributionCommands,
     tip_distribution_handler::TipDistributionCliHandler,
 };
-use jito_tip_distribution_legacy::state::{
-    ClaimStatus, Config, MerkleRootUploadConfig, TipDistributionAccount,
-};
-use jito_tip_distribution_sdk_legacy::{
-    derive_config_account_address, derive_tip_distribution_account_address,
-    instruction::{update_config_ix, UpdateConfigAccounts, UpdateConfigArgs},
-};
+use jito_tip_distribution_sdk_legacy::derive_config_account_address;
 use solana_client::rpc_client::RpcClient;
-use solana_sdk::{
-    instruction::Instruction, pubkey::Pubkey, signature::read_keypair_file, signer::Signer,
-    transaction::Transaction,
-};
+use solana_keypair::read_keypair_file;
+use solana_pubkey::Pubkey;
 
-fn derive_merkle_root_upload_config_account_address(
-    tip_distribution_program_id: &Pubkey,
-) -> (Pubkey, u8) {
-    Pubkey::find_program_address(&[MerkleRootUploadConfig::SEED], tip_distribution_program_id)
-}
-
-fn derive_claim_status_account_address(
-    tip_distribution_program_id: &Pubkey,
-    claimant: &Pubkey,
-    tip_distribution_account: &Pubkey,
-) -> (Pubkey, u8) {
-    Pubkey::find_program_address(
-        &[
-            ClaimStatus::SEED,
-            claimant.to_bytes().as_ref(),
-            tip_distribution_account.to_bytes().as_ref(),
-        ],
-        tip_distribution_program_id,
-    )
-}
+// fn derive_merkle_root_upload_config_account_address(
+//     tip_distribution_program_id: &Pubkey,
+// ) -> (Pubkey, u8) {
+//     Pubkey::find_program_address(&[MerkleRootUploadConfig::SEED], tip_distribution_program_id)
+// }
+//
+// fn derive_claim_status_account_address(
+//     tip_distribution_program_id: &Pubkey,
+//     claimant: &Pubkey,
+//     tip_distribution_account: &Pubkey,
+// ) -> (Pubkey, u8) {
+//     Pubkey::find_program_address(
+//         &[
+//             ClaimStatus::SEED,
+//             claimant.to_bytes().as_ref(),
+//             tip_distribution_account.to_bytes().as_ref(),
+//         ],
+//         tip_distribution_program_id,
+//     )
+// }
 
 // #[derive(Parser)]
 // #[command(author, version, about, long_about = None)]
