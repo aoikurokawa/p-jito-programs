@@ -4,22 +4,20 @@ use solana_pubkey::Pubkey;
 /// The CLI handler for the jito-tip-distribution program
 #[derive(Subcommand)]
 pub enum TipDistributionCommands {
-    /// Initialize, get, and set the config struct
+    /// Initialize, get the config struct
     Config {
         #[command(subcommand)]
         action: ConfigActions,
     },
-    // Ncn {
-    //     #[command(subcommand)]
-    //     action: NcnActions,
-    // },
-    // Operator {
-    //     #[command(subcommand)]
-    //     action: OperatorActions,
-    // },
+
+    /// Initialize, get the TipDistributionAccount struct
+    TipDistributionAccount {
+        #[command(subcommand)]
+        action: TipDistributionAccountActions,
+    },
 }
 
-/// The actions that can be performed on the restaking config
+/// The actions that can be performed on the tip_distribution_account config
 #[derive(Subcommand)]
 pub enum ConfigActions {
     /// Initialize the config
@@ -39,4 +37,64 @@ pub enum ConfigActions {
 
     /// Get the config
     Get,
+
+    //     /// Update the config account information
+    Update {
+        /// Authority pubkey
+        #[arg(long)]
+        authority: String,
+
+        /// Expired funds account pubkey
+        #[arg(long)]
+        expired_funds_account: String,
+
+        /// Number of epochs valid
+        #[arg(long)]
+        num_epochs_valid: u64,
+
+        /// Max validator commission BPS
+        #[arg(long)]
+        max_validator_commission_bps: u16,
+    },
+}
+
+/// The actions that can be performed on the TipDistributionAccount
+#[derive(Subcommand)]
+pub enum TipDistributionAccountActions {
+    /// Initialize the TipDistributionAccount
+    Initialize {
+        /// Validator vote account pubkey
+        #[clap(long)]
+        vote_account: Pubkey,
+
+        /// Merkle root upload authority
+        #[clap(long)]
+        merkle_root_upload_authority: Pubkey,
+
+        /// Validator commission BPS
+        #[clap(long)]
+        validator_commission_bps: u16,
+    },
+
+    /// Get the TipDistributionAccount
+    Get {
+        /// Validator vote account pubkey
+        #[clap(long)]
+        vote_account: String,
+
+        /// Epoch number
+        #[clap(long)]
+        epoch: u64,
+    },
+
+    /// Close the TipDistributionAccount
+    Close {
+        /// Validator vote account pubkey
+        #[arg(long)]
+        vote_account: Pubkey,
+
+        /// Epoch number
+        #[arg(long)]
+        epoch: u64,
+    },
 }
