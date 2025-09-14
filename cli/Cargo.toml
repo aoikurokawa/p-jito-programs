@@ -1,0 +1,28 @@
+[package]
+name = "jito-tip-cli"
+version = { workspace = true }
+edition = { workspace = true }
+readme = { workspace = true }
+
+[[bin]]
+name = "jito-tip-cli"
+path = "src/bin/main.rs"
+
+[dependencies]
+anchor-lang = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+jito-tip-distribution-core = { workspace = true }
+jito_tip_distribution-legacy = { workspace = true }
+jito_tip_distribution_sdk-legacy = { workspace = true }
+solana-client = { workspace = true }
+solana-instruction = { workspace = true }
+solana-keypair = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-sdk = { workspace = true }
+solana-signature = { workspace = true }
+solana-signer = { workspace = true }
+solana-transaction = { workspace = true }
+
+[lints]
+workspace = true
