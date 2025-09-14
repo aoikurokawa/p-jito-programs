@@ -4,22 +4,20 @@ use solana_pubkey::Pubkey;
 /// The CLI handler for the jito-tip-distribution program
 #[derive(Subcommand)]
 pub enum TipDistributionCommands {
-    /// Initialize, get, and set the config struct
+    /// Initialize, get the config struct
     Config {
         #[command(subcommand)]
         action: ConfigActions,
     },
-    // Ncn {
-    //     #[command(subcommand)]
-    //     action: NcnActions,
-    // },
-    // Operator {
-    //     #[command(subcommand)]
-    //     action: OperatorActions,
-    // },
+
+    /// Initialize, get the TipDistributionAccount struct
+    TipDistributionAccount {
+        #[command(subcommand)]
+        action: TipDistributionAccountActions,
+    },
 }
 
-/// The actions that can be performed on the restaking config
+/// The actions that can be performed on the tip_distribution_account config
 #[derive(Subcommand)]
 pub enum ConfigActions {
     /// Initialize the config
@@ -39,4 +37,29 @@ pub enum ConfigActions {
 
     /// Get the config
     Get,
+}
+
+/// The actions that can be performed on the TipDistributionAccount
+#[derive(Subcommand)]
+pub enum TipDistributionAccountActions {
+    /// Initialize the TipDistributionAccount
+    Initialize {
+        /// Validator vote account pubkey
+        vote_account: Pubkey,
+
+        /// Merkle root upload authority
+        merkle_root_upload_authority: Pubkey,
+
+        /// Validator commission BPS
+        validator_commission_bps: u16,
+    },
+
+    /// Get the TipDistributionAccount
+    Get {
+        /// Validator vote account pubkey
+        vote_account: String,
+
+        /// Epoch for the tip distribution account
+        epoch: u64,
+    },
 }

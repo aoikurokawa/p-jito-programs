@@ -55,34 +55,7 @@ use solana_pubkey::Pubkey;
 
 // #[derive(Subcommand)]
 // enum Commands {
-//
-//     /// Get tip distribution account information for a specific validator and epoch
-//     InitializeTipDistributionAccount {
-//         /// Validator vote account pubkey
-//         #[arg(long)]
-//         vote_account: Pubkey,
-//
-//         /// Merkle root upload authority
-//         #[arg(long)]
-//         merkle_root_upload_authority: Pubkey,
-//
-//         /// Validator commission BPS
-//         #[arg(long)]
-//         validator_commission_bps: u16,
-//     },
-//
 //     InitializeMerkleRootUploadConfig,
-//
-//     /// Get tip distribution account information for a specific validator and epoch
-//     GetTipDistributionAccount {
-//         /// Validator vote account pubkey
-//         #[arg(long)]
-//         vote_account: String,
-//
-//         /// Epoch for the tip distribution account
-//         #[arg(long)]
-//         epoch: u64,
-//     },
 //
 //     /// Get claim status for a specific validator, epoch and claimant
 //     GetClaimStatus {
@@ -193,46 +166,7 @@ fn main() -> anyhow::Result<()> {
         ProgramCommand::TipDistribution { action } => {
             TipDistributionCliHandler::new(client, keypair, program_id, config_pda, config_bump)
                 .handle(action)?
-        } // Commands::InitializeTipDistributionAccount {
-          //     vote_account,
-          //     merkle_root_upload_authority,
-          //     validator_commission_bps,
-          // } => {
-          //     let epoch = client.get_epoch_info()?.epoch;
-          //     let (tip_distribution_pubkey, tip_distribution_bump) =
-          //         derive_tip_distribution_account_address(&program_id, &vote_account, epoch);
-
-          //     let ix = Instruction {
-          //         program_id,
-          //         data: jito_tip_distribution_legacy::instruction::InitializeTipDistributionAccount {
-          //             merkle_root_upload_authority,
-          //             validator_commission_bps,
-          //             bump: tip_distribution_bump,
-          //         }
-          //         .data(),
-          //         accounts:
-          //             jito_tip_distribution_legacy::accounts::InitializeTipDistributionAccount {
-          //                 config: config_pda,
-          //                 tip_distribution_account: tip_distribution_pubkey,
-          //                 validator_vote_account: vote_account,
-          //                 signer: keypair.pubkey(),
-          //                 system_program: system_program::ID,
-          //             }
-          //             .to_account_metas(None),
-          //     };
-
-          //     let blockhash = client.get_latest_blockhash()?;
-          //     let tx = Transaction::new_signed_with_payer(
-          //         &[ix],
-          //         Some(&keypair.pubkey()),
-          //         &[keypair],
-          //         blockhash,
-          //     );
-
-          //     client.send_transaction(&tx)?;
-          // }
-
-          // Commands::InitializeMerkleRootUploadConfig => {
+        } // Commands::InitializeMerkleRootUploadConfig => {
           //     let (merkle_root_upload_upload_config_pda, _merkle_root_upload_upload_config_bump) =
           //         derive_merkle_root_upload_config_account_address(&program_id);
 
@@ -269,42 +203,6 @@ fn main() -> anyhow::Result<()> {
           //     vote_account,
           //     epoch,
           // } => {
-          //     let vote_pubkey = Pubkey::from_str(&vote_account)?;
-          //     let (tip_dist_pda, _) =
-          //         derive_tip_distribution_account_address(&program_id, &vote_pubkey, epoch);
-          //     println!("Tip Distribution Account Address: {}", tip_dist_pda);
-
-          //     let account_data = client.get_account(&tip_dist_pda)?.data;
-          //     let tip_dist: TipDistributionAccount =
-          //         TipDistributionAccount::try_deserialize(&mut account_data.as_slice())?;
-
-          //     println!("Tip Distribution Account Data:");
-          //     println!("  Vote Account: {}", tip_dist.validator_vote_account);
-          //     println!(
-          //         "  Merkle Root Upload Authority: {}",
-          //         tip_dist.merkle_root_upload_authority
-          //     );
-          //     println!("  Epoch Created At: {}", tip_dist.epoch_created_at);
-          //     println!(
-          //         "  Validator Commission BPS: {}",
-          //         tip_dist.validator_commission_bps
-          //     );
-          //     println!("  Expires At: {}", tip_dist.expires_at);
-          //     println!("  Bump: {}", tip_dist.bump);
-
-          //     if let Some(merkle_root) = tip_dist.merkle_root {
-          //         println!("  Merkle Root:");
-          //         println!("    Root: {:?}", merkle_root.root);
-          //         println!("    Max Total Claim: {}", merkle_root.max_total_claim);
-          //         println!("    Max Num Nodes: {}", merkle_root.max_num_nodes);
-          //         println!(
-          //             "    Total Funds Claimed: {}",
-          //             merkle_root.total_funds_claimed
-          //         );
-          //         println!("    Num Nodes Claimed: {}", merkle_root.num_nodes_claimed);
-          //     } else {
-          //         println!("  Merkle Root: None");
-          //     }
           // }
 
           // Commands::GetClaimStatus {
