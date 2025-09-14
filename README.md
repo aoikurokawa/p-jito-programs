@@ -6,6 +6,12 @@ Reimplement Jito Programs by Pinocchio
 
 ## Features
 
+## Update Program
+
+```bash
+solana program deploy ./target/sbpf-solana-solana/release/jito_tip_distribution_program.so --program-id ./credentials/jito_tip_distribution.json
+```
+
 ## Compute Units
 
 ### Tip Payment Program
@@ -24,10 +30,10 @@ Reimplement Jito Programs by Pinocchio
 | `InitializeTipDistributionAccount`    | 8395                 | 11090              |
 | `InitializeMerkleRootUploadConfig`    | 11531                |                    |
 | `UpdateConfig`                        |                      |                    |
-| `UploadMerkleRoot`                    |                      |                    |
-| `CloseClaimStatus`                    |                      |                    |
-| `CloseTipDistributionAccount`         |                      |                    |
-| `Claim`                               |                      |                    |
+| `UploadMerkleRoot`                    |                      | 4170               |
+| `CloseClaimStatus`                    |                      | 4894               |
+| `CloseTipDistributionAccount`         |                      | 6207               |
+| `Claim`                               |                      | 23936              |
 | `UpdateMerkleRootUploadConfig`        | 6869                 |                    |
 | `MigrateTdaMerkleRootUploadAuthority` | 2006                 |                    |
 
