@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "cli",
     "core",
     "tip-distribution-core",
     "tip-distribution-program",
@@ -25,7 +26,9 @@ env_logger = "0.11.8"
 envfile = "0.2.1"
 jito-tip-core = { path = "core", version = "=0.0.1" }
 jito-tip-distribution-core = { path = "tip-distribution-core", version = "=0.0.1" }
+jito_tip_distribution-legacy = { package = "jito-tip-distribution", git = "https://github.com/jito-foundation/jito-programs.git" }
 jito-tip-distribution-sdk = { path = "tip-distribution-sdk", version = "=0.0.1" }
+jito_tip_distribution_sdk-legacy = { package = "jito-tip-distribution-sdk", git = "https://github.com/jito-foundation/jito-programs.git" }
 jito-tip-payment-core = { path = "tip-payment-core", version = "=0.0.1" }
 jito-tip-payment-program = { path = "tip-payment-program", version = "=0.0.1" }
 jito-tip-payment-sdk = { path = "tip-payment-sdk", version = "=0.0.1" }
@@ -53,6 +56,7 @@ solana-program = "2.2.0"
 solana-program-entrypoint = "2.2.0"
 solana-program-error = "2.2.0"
 solana-pubkey = "2.2.0"
+solana-sdk = "2.2.0"
 solana-sdk-ids = "2.2.0"
 solana-signature = "2.2.0"
 solana-signer = "2.2.0"
