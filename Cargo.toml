@@ -26,12 +26,12 @@ env_logger = "0.11.8"
 envfile = "0.2.1"
 jito-tip-core = { path = "core", version = "=0.0.1" }
 jito-tip-distribution-core = { path = "tip-distribution-core", version = "=0.0.1" }
-jito_tip_distribution-legacy = { package = "jito-tip-distribution", git = "https://github.com/jito-foundation/jito-programs.git" }
 jito-tip-distribution-sdk = { path = "tip-distribution-sdk", version = "=0.0.1" }
-jito_tip_distribution_sdk-legacy = { package = "jito-tip-distribution-sdk", git = "https://github.com/jito-foundation/jito-programs.git" }
 jito-tip-payment-core = { path = "tip-payment-core", version = "=0.0.1" }
 jito-tip-payment-program = { path = "tip-payment-program", version = "=0.0.1" }
 jito-tip-payment-sdk = { path = "tip-payment-sdk", version = "=0.0.1" }
+jito_tip_distribution-legacy = { package = "jito-tip-distribution", git = "https://github.com/jito-foundation/jito-programs.git" }
+jito_tip_distribution_sdk-legacy = { package = "jito-tip-distribution-sdk", git = "https://github.com/jito-foundation/jito-programs.git" }
 litesvm = "0.6.1"
 log = "0.4.27"
 num-derive = "0.4.2"
