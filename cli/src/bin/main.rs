@@ -55,23 +55,6 @@ use solana_pubkey::Pubkey;
 
 // #[derive(Subcommand)]
 // enum Commands {
-//     /// Initialize the config account information
-//     InitConfig {
-//         /// Authority
-//         authority: Pubkey,
-//
-//         /// Expired funds account
-//         expired_funds_account: Pubkey,
-//
-//         /// Number of epochs is valid
-//         num_epochs_valid: u64,
-//
-//         /// Max validator commission BPS
-//         max_validator_commission_bps: u16,
-//     },
-//
-//     /// Get the config account information
-//     GetConfig,
 //
 //     /// Get tip distribution account information for a specific validator and epoch
 //     InitializeTipDistributionAccount {
@@ -210,25 +193,7 @@ fn main() -> anyhow::Result<()> {
         ProgramCommand::TipDistribution { action } => {
             TipDistributionCliHandler::new(client, keypair, program_id, config_pda, config_bump)
                 .handle(action)?
-        } // Commands::GetConfig => {
-          //     let (config_pda, _) = derive_config_account_address(&program_id);
-          //     println!("Config Account Address: {}", config_pda);
-
-          //     let config_data = client.get_account(&config_pda)?.data;
-          //     let config: Config = Config::try_deserialize(&mut config_data.as_slice())?;
-
-          //     println!("Config Account Data:");
-          //     println!("  Authority: {}", config.authority);
-          //     println!("  Expired Funds Account: {}", config.expired_funds_account);
-          //     println!("  Num Epochs Valid: {}", config.num_epochs_valid);
-          //     println!(
-          //         "  Max Validator Commission BPS: {}",
-          //         config.max_validator_commission_bps
-          //     );
-          //     println!("  Bump: {}", config.bump);
-          // }
-
-          // Commands::InitializeTipDistributionAccount {
+        } // Commands::InitializeTipDistributionAccount {
           //     vote_account,
           //     merkle_root_upload_authority,
           //     validator_commission_bps,
