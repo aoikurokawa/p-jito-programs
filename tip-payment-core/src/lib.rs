@@ -1,25 +1,12 @@
 #![no_std]
 
+use jito_tip_core::transmutable::Transmutable;
 use pinocchio::program_error::ProgramError;
 
 pub mod config;
 pub mod fees;
 pub mod init_bumps;
 pub mod tip_payment_account;
-
-/// Marker trait for types that can be cast from a raw pointer.
-///
-/// # Safety
-///
-/// It is up to the type implementing this trait to guarantee that the cast is
-/// safe, i.e., the fields of the type are well aligned and there are no padding
-/// bytes.
-pub unsafe trait Transmutable {
-    /// The length of the type.
-    ///
-    /// This must be equal to the size of each individual field in the type.
-    const LEN: usize;
-}
 
 // Trait to represent a type that can be initialized.
 // pub trait Initializable {

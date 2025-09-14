@@ -1,10 +1,11 @@
 use jito_tip_core::{
     create_account,
     loader::{load_signer, load_system_program},
+    transmutable::Transmutable,
 };
 use jito_tip_distribution_core::{
     config::Config, load_mut_unchecked, load_unchecked,
-    merkle_root_upload_config::MerkleRootUploadConfig, Transmutable,
+    merkle_root_upload_config::MerkleRootUploadConfig,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{

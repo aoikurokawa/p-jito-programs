@@ -1,7 +1,7 @@
-use jito_tip_core::{create_account, loader::load_signer};
+use jito_tip_core::{create_account, loader::load_signer, transmutable::Transmutable};
 use jito_tip_distribution_core::{
     claim_status::ClaimStatus, config::Config, load_mut_unchecked,
-    tip_distribution_account::TipDistributionAccount, Transmutable,
+    tip_distribution_account::TipDistributionAccount,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{

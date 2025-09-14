@@ -1,7 +1,10 @@
-use jito_tip_core::loader::{load_signer, load_system_account, load_system_program};
+use jito_tip_core::{
+    loader::{load_signer, load_system_account, load_system_program},
+    transmutable::Transmutable,
+};
 use jito_tip_payment_core::{
     config::Config, init_bumps::InitBumps, load_mut_unchecked,
-    tip_payment_account::TipPaymentAccount, Transmutable,
+    tip_payment_account::TipPaymentAccount,
 };
 use pinocchio::{
     account_info::AccountInfo,
