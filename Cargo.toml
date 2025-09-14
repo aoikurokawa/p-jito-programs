@@ -7,7 +7,7 @@ members = [
     "tip-payment-core",
     "tip-payment-program",
     "tip-payment-sdk",
-    "vote-state"
+    "vote-state",
 ]
 resolver = "2"
 
