@@ -31,28 +31,6 @@ use solana_pubkey::Pubkey;
 //     )
 // }
 
-// #[derive(Parser)]
-// #[command(author, version, about, long_about = None)]
-// struct Cli {
-//     /// RPC URL for the Solana cluster
-//     #[arg(short, long, default_value = "https://api.devnet.solana.com")]
-//     rpc_url: String,
-//
-//     /// Tip Distribution program ID
-//     #[arg(
-//         short,
-//         long,
-//         default_value = "3vgVYgJxqFKF2cFYHV4GPBUnLynCJYmKizq9DRmZmTUf"
-//     )]
-//     program_id: String,
-//
-//     #[arg(short, long)]
-//     keypair_path: String,
-//
-//     #[command(subcommand)]
-//     command: Commands,
-// }
-
 // #[derive(Subcommand)]
 // enum Commands {
 //     InitializeMerkleRootUploadConfig,
@@ -70,25 +48,6 @@ use solana_pubkey::Pubkey;
 //         /// Claimant pubkey
 //         #[arg(long)]
 //         claimant: String,
-//     },
-//
-//     /// Update the config account information
-//     UpdateConfig {
-//         /// Authority pubkey
-//         #[arg(long)]
-//         authority: String,
-//
-//         /// Expired funds account pubkey
-//         #[arg(long)]
-//         expired_funds_account: String,
-//
-//         /// Number of epochs valid
-//         #[arg(long)]
-//         num_epochs_valid: u64,
-//
-//         /// Max validator commission BPS
-//         #[arg(long)]
-//         max_validator_commission_bps: u16,
 //     },
 //
 //     /// Upload merkle root
@@ -235,44 +194,6 @@ fn main() -> anyhow::Result<()> {
           //     println!("  Bump: {}", claim_status.bump);
           // }
 
-          // Commands::UpdateConfig {
-          //     authority,
-          //     expired_funds_account,
-          //     num_epochs_valid,
-          //     max_validator_commission_bps,
-          // } => {
-          //     let authority_pubkey = Pubkey::from_str(&authority)?;
-          //     let expired_funds_account_pubkey = Pubkey::from_str(&expired_funds_account)?;
-
-          //     let config = Config {
-          //         authority: authority_pubkey,
-          //         expired_funds_account: expired_funds_account_pubkey,
-          //         num_epochs_valid,
-          //         max_validator_commission_bps,
-          //         bump: config_bump,
-          //     };
-
-          //     let accounts = UpdateConfigAccounts {
-          //         config: Pubkey::default(),
-          //         authority: authority_pubkey,
-          //     };
-
-          //     let instruction = update_config_ix(
-          //         program_id,
-          //         UpdateConfigArgs { new_config: config },
-          //         accounts,
-          //     );
-
-          //     let blockhash = client.get_latest_blockhash()?;
-          //     let tx = Transaction::new_signed_with_payer(
-          //         &[instruction],
-          //         Some(&keypair.pubkey()),
-          //         &[keypair],
-          //         blockhash,
-          //     );
-
-          //     client.send_transaction(&tx)?;
-          // }
           // Commands::UploadMerkleRoot {
           //     vote_account,
           //     root,

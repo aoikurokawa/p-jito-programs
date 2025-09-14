@@ -37,6 +37,25 @@ pub enum ConfigActions {
 
     /// Get the config
     Get,
+
+    //     /// Update the config account information
+    Update {
+        /// Authority pubkey
+        #[arg(long)]
+        authority: String,
+
+        /// Expired funds account pubkey
+        #[arg(long)]
+        expired_funds_account: String,
+
+        /// Number of epochs valid
+        #[arg(long)]
+        num_epochs_valid: u64,
+
+        /// Max validator commission BPS
+        #[arg(long)]
+        max_validator_commission_bps: u16,
+    },
 }
 
 /// The actions that can be performed on the TipDistributionAccount

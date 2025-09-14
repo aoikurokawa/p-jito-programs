@@ -2,7 +2,10 @@ use std::{str::FromStr, sync::Arc};
 
 use anchor_lang::{AccountDeserialize, InstructionData, ToAccountMetas};
 use jito_tip_distribution_legacy::state::{Config, TipDistributionAccount};
-use jito_tip_distribution_sdk_legacy::derive_tip_distribution_account_address;
+use jito_tip_distribution_sdk_legacy::{
+    derive_tip_distribution_account_address,
+    instruction::{update_config_ix, UpdateConfigAccounts, UpdateConfigArgs},
+};
 use solana_client::rpc_client::RpcClient;
 use solana_instruction::Instruction;
 use solana_keypair::Keypair;
@@ -71,6 +74,20 @@ impl TipDistributionCliHandler {
             TipDistributionCommands::Config {
                 action: ConfigActions::Get,
             } => self.get_config(),
+            TipDistributionCommands::Config {
+                action:
+                    ConfigActions::Update {
+                        authority,
+                        expired_funds_account,
+                        num_epochs_valid,
+                        max_validator_commission_bps,
+                    },
+            } => self.update_config(
+                authority,
+                expired_funds_account,
+                num_epochs_valid,
+                max_validator_commission_bps,
+            ),
             TipDistributionCommands::TipDistributionAccount {
                 action:
                     TipDistributionAccountActions::Initialize {
@@ -149,6 +166,48 @@ impl TipDistributionCliHandler {
         let blockhash = self.client.get_latest_blockhash()?;
         let tx = Transaction::new_signed_with_payer(
             &[ix],
+            Some(&self.keypair.pubkey()),
+            &[self.keypair.clone()],
+            blockhash,
+        );
+
+        self.client.send_transaction(&tx)?;
+
+        Ok(())
+    }
+
+    pub fn update_config(
+        &self,
+        authority: String,
+        expired_funds_account: String,
+        num_epochs_valid: u64,
+        max_validator_commission_bps: u16,
+    ) -> anyhow::Result<()> {
+        let authority_pubkey = Pubkey::from_str(&authority)?;
+        let expired_funds_account_pubkey = Pubkey::from_str(&expired_funds_account)?;
+
+        let config = Config {
+            authority: authority_pubkey,
+            expired_funds_account: expired_funds_account_pubkey,
+            num_epochs_valid,
+            max_validator_commission_bps,
+            bump: self.config_bump,
+        };
+
+        let accounts = UpdateConfigAccounts {
+            config: Pubkey::default(),
+            authority: authority_pubkey,
+        };
+
+        let instruction = update_config_ix(
+            self.program_id,
+            UpdateConfigArgs { new_config: config },
+            accounts,
+        );
+
+        let blockhash = self.client.get_latest_blockhash()?;
+        let tx = Transaction::new_signed_with_payer(
+            &[instruction],
             Some(&self.keypair.pubkey()),
             &[self.keypair.clone()],
             blockhash,
