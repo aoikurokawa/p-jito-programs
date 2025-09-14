@@ -32,7 +32,7 @@ impl AuthorizedVoters {
 
 const MAX_ITEMS: usize = 32;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct CircBuf<I> {
     buf: [I; MAX_ITEMS],
     /// next pointer
@@ -46,10 +46,15 @@ pub struct BlockTimestamp {
     pub timestamp: UnixTimestamp,
 }
 
+#[derive(Clone)]
 pub enum VoteStateVersions {
     V0_23_5(Box<VoteState0_23_5>),
     V1_14_11(Box<VoteState1_14_11>),
     Current(Box<VoteState>),
+}
+
+unsafe impl Transmutable for VoteStateVersions {
+    const LEN: usize = std::mem::size_of::<Self>();
 }
 
 impl VoteStateVersions {
@@ -105,6 +110,7 @@ impl VoteStateVersions {
     }
 }
 
+#[derive(Clone)]
 pub struct VoteState1_14_11 {
     /// the node that votes in this account
     pub node_pubkey: Pubkey,
@@ -137,6 +143,7 @@ pub struct VoteState1_14_11 {
     pub last_timestamp: BlockTimestamp,
 }
 
+#[derive(Clone)]
 pub struct VoteState0_23_5 {
     /// the node that votes in this account
     pub node_pubkey: Pubkey,
@@ -168,6 +175,7 @@ pub struct VoteState0_23_5 {
     pub last_timestamp: BlockTimestamp,
 }
 
+#[derive(Clone)]
 pub struct VoteState {
     /// the node that votes in this account
     pub node_pubkey: Pubkey,
@@ -200,6 +208,7 @@ pub struct VoteState {
     pub last_timestamp: BlockTimestamp,
 }
 
+#[derive(Clone)]
 pub struct LandedVote {
     // Latency is the difference in slot number between the slot that was voted on (lockout.slot) and the slot in
     // which the vote that added this Lockout landed.  For votes which were cast before versions of the validator
@@ -234,14 +243,52 @@ impl From<Lockout> for LandedVote {
 }
 
 impl VoteState {
+    /// Deserialize VoteState
+    ///
+    /// # Safety
+    ///
+    /// It is up to the type implementing this trait to guarantee that the cast is
+    /// safe, i.e., the fields of the type are well aligned and there are no padding
+    /// bytes.
     pub unsafe fn deserialize(account_info: &AccountInfo) -> Result<Box<Self>, ProgramError> {
         if account_info.owner() != &(solana_program::vote::program::id().to_bytes() as Pubkey) {
-            return Err(ProgramError::ConstraintOwner.into());
+            return Err(ProgramError::InvalidAccountOwner);
         }
 
-        let data = account_info.data.borrow();
-        deserialize::<Box<VoteStateVersions>>(&data)
-            .map(|v| v.convert_to_current())
-            .map_err(|_| AccountDidNotDeserialize.into())
+        let data = account_info.borrow_data_unchecked();
+
+        let vote_state_versions = load_unchecked::<VoteStateVersions>(data)?;
+        let vote_state_versions = vote_state_versions.clone();
+        let vote_state = vote_state_versions.convert_to_current();
+        Ok(vote_state)
     }
+}
+
+/// Marker trait for types that can be cast from a raw pointer.
+///
+/// # Safety
+///
+/// It is up to the type implementing this trait to guarantee that the cast is
+/// safe, i.e., the fields of the type are well aligned and there are no padding
+/// bytes.
+pub unsafe trait Transmutable {
+    /// The length of the type.
+    ///
+    /// This must be equal to the size of each individual field in the type.
+    const LEN: usize;
+}
+
+/// Return a `T` reference from the given bytes.
+///
+/// This function does not check if the data is initialized.
+///
+/// # Safety
+///
+/// The caller must ensure that `bytes` contains a valid representation of `T`.
+#[inline(always)]
+pub const unsafe fn load_unchecked<T: Transmutable>(bytes: &[u8]) -> Result<&T, ProgramError> {
+    if bytes.len() != T::LEN {
+        return Err(ProgramError::InvalidAccountData);
+    }
+    Ok(&*(bytes.as_ptr() as *const T))
 }

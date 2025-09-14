@@ -1512,6 +1512,7 @@ dependencies = [
  "pinocchio-pubkey 0.2.4",
  "pinocchio-system",
  "solana-program",
+ "vote-state",
 ]
 
 [[package]]
@@ -4790,6 +4791,14 @@ name = "void"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a02e4885ed3bc0f2de90ea6dd45ebcbb66dacffe03547fadbb0eeae2770887d"
+
+[[package]]
+name = "vote-state"
+version = "0.0.1"
+dependencies = [
+ "pinocchio 0.9.0",
+ "solana-program",
+]
 
 [[package]]
 name = "want"
