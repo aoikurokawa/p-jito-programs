@@ -5,6 +5,7 @@ edition = { workspace = true }
 readme = { workspace = true }
 
 [dependencies]
+jito-tip-core = { workspace = true }
 pinocchio = { workspace = true }
 solana-program = { workspace = true }
 
