@@ -17,6 +17,7 @@ pinocchio-log = { workspace = true }
 pinocchio-pubkey = { workspace = true }
 pinocchio-system = { workspace = true }
 solana-program = { workspace = true }
+vote-state = { workspace = true }
 
 [lints]
 workspace = true

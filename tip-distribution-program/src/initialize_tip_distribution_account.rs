@@ -15,6 +15,7 @@ use pinocchio::{
     sysvars::{clock::Clock, rent::Rent, Sysvar},
 };
 use pinocchio_log::log;
+use vote_state::VoteState;
 
 /// Initialize a new [TipDistributionAccount] associated with the given validator vote key
 /// and current epoch.
@@ -48,10 +49,12 @@ pub fn process_initialize_tip_distribution_account(
         return Err(TipDistributionError::MaxValidatorCommissionFeeBpsExceeded.into());
     }
 
-    // let validator_vote_state = VoteState::deserialize(&ctx.accounts.validator_vote_account)?;
-    // if &validator_vote_state.node_pubkey != ctx.accounts.signer.key {
-    //     return Err(Unauthorized.into());
-    // }
+    unsafe {
+        let validator_vote_state = VoteState::deserialize(&validator_vote_account_info)?;
+        if validator_vote_state.node_pubkey.ne(signer_info.key()) {
+            return Err(TipDistributionError::Unauthorized.into());
+        }
+    }
 
     let current_epoch = Clock::get()?.epoch;
     let rent = Rent::get()?;
