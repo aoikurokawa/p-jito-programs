@@ -243,6 +243,13 @@ impl From<Lockout> for LandedVote {
 }
 
 impl VoteState {
+    /// Deserialize VoteState
+    ///
+    /// # Safety
+    ///
+    /// It is up to the type implementing this trait to guarantee that the cast is
+    /// safe, i.e., the fields of the type are well aligned and there are no padding
+    /// bytes.
     pub unsafe fn deserialize(account_info: &AccountInfo) -> Result<Box<Self>, ProgramError> {
         if account_info.owner() != &(solana_program::vote::program::id().to_bytes() as Pubkey) {
             return Err(ProgramError::InvalidAccountOwner);
@@ -250,14 +257,10 @@ impl VoteState {
 
         let data = account_info.borrow_data_unchecked();
 
-        let vote_state_versions = load_unchecked::<VoteStateVersions>(&data)?;
+        let vote_state_versions = load_unchecked::<VoteStateVersions>(data)?;
         let vote_state_versions = vote_state_versions.clone();
         let vote_state = vote_state_versions.convert_to_current();
         Ok(vote_state)
-
-        // deserialize::<Box<VoteStateVersions>>(&data)
-        //     .map(|v| v.convert_to_current())
-        //     .map_err(|_| AccountDidNotDeserialize.into())
     }
 }
 

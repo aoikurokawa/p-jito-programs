@@ -50,7 +50,7 @@ pub fn process_initialize_tip_distribution_account(
     }
 
     unsafe {
-        let validator_vote_state = VoteState::deserialize(&validator_vote_account_info)?;
+        let validator_vote_state = VoteState::deserialize(validator_vote_account_info)?;
         if validator_vote_state.node_pubkey.ne(signer_info.key()) {
             return Err(TipDistributionError::Unauthorized.into());
         }
