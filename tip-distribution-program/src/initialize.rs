@@ -1,8 +1,9 @@
 use jito_tip_core::{
     create_account,
     loader::{load_signer, load_system_program},
+    transmutable::Transmutable,
 };
-use jito_tip_distribution_core::{config::Config, load_mut_unchecked, Transmutable};
+use jito_tip_distribution_core::{config::Config, load_mut_unchecked};
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{
     account_info::AccountInfo,

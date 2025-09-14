@@ -1,7 +1,8 @@
+use jito_tip_core::transmutable::Transmutable;
 use pinocchio::pubkey::{find_program_address, Pubkey};
 use shank::ShankAccount;
 
-use crate::{init_bumps::InitBumps, Transmutable};
+use crate::init_bumps::InitBumps;
 
 /// Stores program config metadata.
 #[derive(Debug, Default, ShankAccount)]

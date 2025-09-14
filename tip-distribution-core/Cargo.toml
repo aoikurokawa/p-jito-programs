@@ -5,6 +5,7 @@ edition = { workspace = true }
 readme = { workspace = true }
 
 [dependencies]
+jito-tip-core = { workspace = true }
 jito-tip-distribution-sdk = { workspace = true }
 pinocchio = { workspace = true }
 pinocchio-log = { workspace = true }

@@ -5,6 +5,7 @@ use pinocchio::{
 use pinocchio_system::instructions::{Allocate, Assign, CreateAccount, Transfer};
 
 pub mod loader;
+pub mod transmutable;
 
 /// Creates a new account or initializes an existing account
 ///
