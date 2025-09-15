@@ -10,11 +10,6 @@ use solana_client::rpc_client::RpcClient;
 use solana_keypair::read_keypair_file;
 use solana_pubkey::Pubkey;
 
-// fn derive_merkle_root_upload_config_account_address(
-//     tip_distribution_program_id: &Pubkey,
-// ) -> (Pubkey, u8) {
-//     Pubkey::find_program_address(&[MerkleRootUploadConfig::SEED], tip_distribution_program_id)
-// }
 //
 // fn derive_claim_status_account_address(
 //     tip_distribution_program_id: &Pubkey,
@@ -33,8 +28,6 @@ use solana_pubkey::Pubkey;
 
 // #[derive(Subcommand)]
 // enum Commands {
-//     InitializeMerkleRootUploadConfig,
-//
 //     /// Get claim status for a specific validator, epoch and claimant
 //     GetClaimStatus {
 //         /// Validator vote account pubkey
@@ -50,30 +43,6 @@ use solana_pubkey::Pubkey;
 //         claimant: String,
 //     },
 //
-//     /// Upload merkle root
-//     UploadMerkleRoot {
-//         #[arg(long)]
-//         vote_account: Pubkey,
-//
-//         #[arg(long)]
-//         root: String,
-//
-//         #[arg(long)]
-//         max_total_claim: u64,
-//
-//         #[arg(long)]
-//         max_num_nodes: u64,
-//     },
-//
-//     UpdateMerkleRootUploadConfig,
-//
-//     MigrateTdaMerkleRootUploadAuthority {
-//         #[arg(long)]
-//         vote_account: Pubkey,
-//
-//         #[arg(long)]
-//         epoch: u64,
-//     },
 //
 //     CloseClaimStatus {
 //         #[arg(long)]
@@ -118,46 +87,7 @@ fn main() -> anyhow::Result<()> {
         ProgramCommand::TipDistribution { action } => {
             TipDistributionCliHandler::new(client, keypair, program_id, config_pda, config_bump)
                 .handle(action)?
-        } // Commands::InitializeMerkleRootUploadConfig => {
-          //     let (merkle_root_upload_upload_config_pda, _merkle_root_upload_upload_config_bump) =
-          //         derive_merkle_root_upload_config_account_address(&program_id);
-
-          //     let ix = Instruction {
-          //         program_id,
-          //         data: jito_tip_distribution_legacy::instruction::InitializeMerkleRootUploadConfig {
-          //             authority: keypair.pubkey(),
-          //             original_authority: keypair.pubkey(),
-          //         }
-          //         .data(),
-          //         accounts:
-          //             jito_tip_distribution_legacy::accounts::InitializeMerkleRootUploadConfig {
-          //                 config: config_pda,
-          //                 merkle_root_upload_config: merkle_root_upload_upload_config_pda,
-          //                 authority: keypair.pubkey(),
-          //                 payer: keypair.pubkey(),
-          //                 system_program: system_program::ID,
-          //             }
-          //             .to_account_metas(None),
-          //     };
-
-          //     let blockhash = client.get_latest_blockhash()?;
-          //     let tx = Transaction::new_signed_with_payer(
-          //         &[ix],
-          //         Some(&keypair.pubkey()),
-          //         &[keypair],
-          //         blockhash,
-          //     );
-
-          //     client.send_transaction(&tx)?;
-          // }
-
-          // Commands::GetTipDistributionAccount {
-          //     vote_account,
-          //     epoch,
-          // } => {
-          // }
-
-          // Commands::GetClaimStatus {
+        } // Commands::GetClaimStatus {
           //     vote_account,
           //     epoch,
           //     claimant,
@@ -192,126 +122,6 @@ fn main() -> anyhow::Result<()> {
           //     println!("  Amount: {}", claim_status.amount);
           //     println!("  Expires At: {}", claim_status.expires_at);
           //     println!("  Bump: {}", claim_status.bump);
-          // }
-
-          // Commands::UploadMerkleRoot {
-          //     vote_account,
-          //     root,
-          //     max_total_claim,
-          //     max_num_nodes,
-          // } => {
-          //     let root_bytes: Vec<u8> = root
-          //         .split(',')
-          //         .map(|byte_str| {
-          //             byte_str
-          //                 .trim()
-          //                 .parse::<u8>()
-          //                 .map_err(|e| anyhow::anyhow!("Invalid byte '{}': {}", byte_str, e))
-          //         })
-          //         .collect::<Result<Vec<u8>, _>>()?;
-
-          //     if root_bytes.len() != 32 {
-          //         return Err(anyhow::anyhow!(
-          //             "Root must be exactly 32 bytes, got {}",
-          //             root_bytes.len()
-          //         ));
-          //     }
-
-          //     let mut source: [u8; 32] = [0; 32];
-          //     source.copy_from_slice(&root_bytes);
-
-          //     let epoch = client.get_epoch_info()?.epoch;
-          //     let (tip_distribution_pubkey, _tip_distribution_bump) =
-          //         derive_tip_distribution_account_address(&program_id, &vote_account, epoch);
-
-          //     let ix = Instruction {
-          //         program_id,
-          //         data: jito_tip_distribution_legacy::instruction::UploadMerkleRoot {
-          //             root: source,
-          //             max_total_claim,
-          //             max_num_nodes,
-          //         }
-          //         .data(),
-          //         accounts: jito_tip_distribution_legacy::accounts::UploadMerkleRoot {
-          //             config: config_pda,
-          //             merkle_root_upload_authority: keypair.pubkey(),
-          //             tip_distribution_account: tip_distribution_pubkey,
-          //         }
-          //         .to_account_metas(None),
-          //     };
-
-          //     let blockhash = client.get_latest_blockhash()?;
-          //     let tx = Transaction::new_signed_with_payer(
-          //         &[ix],
-          //         Some(&keypair.pubkey()),
-          //         &[keypair],
-          //         blockhash,
-          //     );
-
-          //     client.send_transaction(&tx)?;
-          // }
-          // Commands::UpdateMerkleRootUploadConfig => {
-          //     let (merkle_root_upload_config_pda, _merkle_root_upload_config_bump) =
-          //         derive_merkle_root_upload_config_account_address(&program_id);
-
-          //     let ix = Instruction {
-          //         program_id,
-          //         data: jito_tip_distribution_legacy::instruction::UpdateMerkleRootUploadConfig {
-          //             authority: keypair.pubkey(),
-          //             original_authority: keypair.pubkey(),
-          //         }
-          //         .data(),
-          //         accounts: jito_tip_distribution_legacy::accounts::UpdateMerkleRootUploadConfig {
-          //             config: config_pda,
-          //             merkle_root_upload_config: merkle_root_upload_config_pda,
-          //             authority: keypair.pubkey(),
-          //             system_program: system_program::ID,
-          //         }
-          //         .to_account_metas(None),
-          //     };
-
-          //     let blockhash = client.get_latest_blockhash()?;
-          //     let tx = Transaction::new_signed_with_payer(
-          //         &[ix],
-          //         Some(&keypair.pubkey()),
-          //         &[keypair],
-          //         blockhash,
-          //     );
-
-          //     client.send_transaction(&tx)?;
-          // }
-
-          // Commands::MigrateTdaMerkleRootUploadAuthority {
-          //     vote_account,
-          //     epoch,
-          // } => {
-          //     let (tip_distribution_pda, _tip_distribution_bump) =
-          //         derive_tip_distribution_account_address(&program_id, &vote_account, epoch);
-          //     let (merkle_root_upload_config_pda, _merkle_root_upload_config_bump) =
-          //         derive_merkle_root_upload_config_account_address(&program_id);
-
-          //     let ix = Instruction {
-          //         program_id,
-          //         data:
-          //             jito_tip_distribution_legacy::instruction::MigrateTdaMerkleRootUploadAuthority
-          //                 .data(),
-          //         accounts:
-          //             jito_tip_distribution_legacy::accounts::MigrateTdaMerkleRootUploadAuthority {
-          //                 tip_distribution_account: tip_distribution_pda,
-          //                 merkle_root_upload_config: merkle_root_upload_config_pda,
-          //             }
-          //             .to_account_metas(None),
-          //     };
-
-          //     let blockhash = client.get_latest_blockhash()?;
-          //     let tx = Transaction::new_signed_with_payer(
-          //         &[ix],
-          //         Some(&keypair.pubkey()),
-          //         &[keypair],
-          //         blockhash,
-          //     );
-
-          //     client.send_transaction(&tx)?;
           // }
 
           // Commands::CloseClaimStatus {

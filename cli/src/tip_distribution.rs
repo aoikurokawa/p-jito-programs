@@ -15,6 +15,12 @@ pub enum TipDistributionCommands {
         #[command(subcommand)]
         action: TipDistributionAccountActions,
     },
+
+    /// Initialize, get the MerkleRootUploadConfig struct
+    MerkleRootUploadConfig {
+        #[command(subcommand)]
+        action: MerkleRootUploadConfigActions,
+    },
 }
 
 /// The actions that can be performed on the tip_distribution_account config
@@ -76,6 +82,25 @@ pub enum TipDistributionAccountActions {
         validator_commission_bps: u16,
     },
 
+    /// Upload merkle root
+    UploadMerkleRoot {
+        /// Validator vote account pubkey
+        #[arg(long)]
+        vote_account: Pubkey,
+
+        /// Root
+        #[arg(long)]
+        root: String,
+
+        /// Max Total Claim
+        #[arg(long)]
+        max_total_claim: u64,
+
+        /// Max number of nodes
+        #[arg(long)]
+        max_num_nodes: u64,
+    },
+
     /// Get the TipDistributionAccount
     Get {
         /// Validator vote account pubkey
@@ -89,6 +114,27 @@ pub enum TipDistributionAccountActions {
 
     /// Close the TipDistributionAccount
     Close {
+        /// Validator vote account pubkey
+        #[arg(long)]
+        vote_account: Pubkey,
+
+        /// Epoch number
+        #[arg(long)]
+        epoch: u64,
+    },
+}
+
+/// The actions that can be performed on the MerkleRootUploadConfig
+#[derive(Subcommand)]
+pub enum MerkleRootUploadConfigActions {
+    /// Initialize the MerkleRootUploadConfig
+    Initialize,
+
+    /// Update the MerkleRootUploadConfig
+    Update,
+
+    /// Update the MerkleRootUploadConfig authority
+    MigrateTdaMerkleRootUploadAuthority {
         /// Validator vote account pubkey
         #[arg(long)]
         vote_account: Pubkey,
