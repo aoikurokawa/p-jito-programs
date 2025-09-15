@@ -459,6 +459,10 @@ impl TipDistributionCliHandler {
     }
 
     pub fn list_tip_distribution_accounts(&self) -> anyhow::Result<()> {
+        // let data_size = std::mem::size_of::<TipDistributionAccount>()
+        //     .checked_add(8)
+        //     .ok_or_else(|| anyhow!("Failed to add"))?;
+
         let data_size = TipDistributionAccount::SIZE
             .checked_add(8)
             .ok_or_else(|| anyhow!("Failed to add"))?;
@@ -494,6 +498,9 @@ impl TipDistributionCliHandler {
             .get_program_accounts_with_config(&self.program_id, config)?;
 
         for (_pubkey, account) in accounts {
+            // let tip_dist: TipDistributionAccount =
+            //     TipDistributionAccount::try_deserialize(&mut account.data.as_slice())?;
+
             let tip_dist = unsafe {
                 load_unchecked::<
                     jito_tip_distribution_core::tip_distribution_account::TipDistributionAccount,
