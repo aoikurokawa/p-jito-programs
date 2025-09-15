@@ -21,6 +21,12 @@ pub enum TipDistributionCommands {
         #[command(subcommand)]
         action: MerkleRootUploadConfigActions,
     },
+
+    /// Initialize, get the ClaimStatus struct
+    ClaimStatus {
+        #[command(subcommand)]
+        action: ClaimStatusActions,
+    },
 }
 
 /// The actions that can be performed on the tip_distribution_account config
@@ -142,5 +148,51 @@ pub enum MerkleRootUploadConfigActions {
         /// Epoch number
         #[arg(long)]
         epoch: u64,
+    },
+}
+
+/// The actions that can be performed on the MerkleRootUploadConfig
+#[derive(Subcommand)]
+pub enum ClaimStatusActions {
+    /// Claim
+    Claim {
+        #[arg(long)]
+        vote_account: Pubkey,
+
+        #[arg(long)]
+        epoch: u64,
+
+        #[arg(long)]
+        claimant: Pubkey,
+
+        #[arg(long)]
+        amount: u64,
+    },
+
+    /// Get claim status for a specific validator, epoch and claimant
+    GetClaimStatus {
+        /// Validator vote account pubkey
+        #[arg(long)]
+        vote_account: String,
+
+        /// Epoch for the tip distribution account
+        #[arg(long)]
+        epoch: u64,
+
+        /// Claimant pubkey
+        #[arg(long)]
+        claimant: String,
+    },
+
+    /// Close claim status
+    CloseClaimStatus {
+        #[arg(long)]
+        vote_account: Pubkey,
+
+        #[arg(long)]
+        epoch: u64,
+
+        #[arg(long)]
+        claimant: Pubkey,
     },
 }

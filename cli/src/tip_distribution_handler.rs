@@ -1,7 +1,9 @@
 use std::{str::FromStr, sync::Arc};
 
 use anchor_lang::{AccountDeserialize, InstructionData, ToAccountMetas};
-use jito_tip_distribution_legacy::state::{Config, MerkleRootUploadConfig, TipDistributionAccount};
+use jito_tip_distribution_legacy::state::{
+    ClaimStatus, Config, MerkleRootUploadConfig, TipDistributionAccount,
+};
 use jito_tip_distribution_sdk_legacy::{
     derive_tip_distribution_account_address,
     instruction::{update_config_ix, UpdateConfigAccounts, UpdateConfigArgs},
@@ -15,14 +17,29 @@ use solana_signer::Signer;
 use solana_transaction::Transaction;
 
 use crate::tip_distribution::{
-    ConfigActions, MerkleRootUploadConfigActions, TipDistributionAccountActions,
-    TipDistributionCommands,
+    ClaimStatusActions, ConfigActions, MerkleRootUploadConfigActions,
+    TipDistributionAccountActions, TipDistributionCommands,
 };
 
 fn derive_merkle_root_upload_config_account_address(
     tip_distribution_program_id: &Pubkey,
 ) -> (Pubkey, u8) {
     Pubkey::find_program_address(&[MerkleRootUploadConfig::SEED], tip_distribution_program_id)
+}
+
+fn derive_claim_status_account_address(
+    tip_distribution_program_id: &Pubkey,
+    claimant: &Pubkey,
+    tip_distribution_account: &Pubkey,
+) -> (Pubkey, u8) {
+    Pubkey::find_program_address(
+        &[
+            ClaimStatus::SEED,
+            claimant.to_bytes().as_ref(),
+            tip_distribution_account.to_bytes().as_ref(),
+        ],
+        tip_distribution_program_id,
+    )
 }
 
 pub struct TipDistributionCliHandler {
@@ -143,6 +160,31 @@ impl TipDistributionCliHandler {
                         epoch,
                     },
             } => self.migrate_merkle_root_upload_config_authority(vote_account, epoch),
+            TipDistributionCommands::ClaimStatus {
+                action:
+                    ClaimStatusActions::Claim {
+                        vote_account,
+                        epoch,
+                        claimant,
+                        amount,
+                    },
+            } => self.claim(vote_account, epoch, claimant, amount),
+            TipDistributionCommands::ClaimStatus {
+                action:
+                    ClaimStatusActions::GetClaimStatus {
+                        vote_account,
+                        epoch,
+                        claimant,
+                    },
+            } => self.get_claim_status(vote_account, epoch, claimant),
+            TipDistributionCommands::ClaimStatus {
+                action:
+                    ClaimStatusActions::CloseClaimStatus {
+                        vote_account,
+                        epoch,
+                        claimant,
+                    },
+            } => self.close_claim_status(vote_account, epoch, claimant),
         }
     }
 
@@ -519,6 +561,127 @@ impl TipDistributionCliHandler {
             accounts: jito_tip_distribution_legacy::accounts::MigrateTdaMerkleRootUploadAuthority {
                 tip_distribution_account: tip_distribution_pda,
                 merkle_root_upload_config: merkle_root_upload_config_pda,
+            }
+            .to_account_metas(None),
+        };
+
+        let blockhash = self.client.get_latest_blockhash()?;
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&self.keypair.pubkey()),
+            &[self.keypair.clone()],
+            blockhash,
+        );
+
+        self.client.send_transaction(&tx)?;
+
+        Ok(())
+    }
+
+    pub fn claim(
+        &self,
+        vote_account: Pubkey,
+        epoch: u64,
+        claimant: Pubkey,
+        amount: u64,
+    ) -> anyhow::Result<()> {
+        let (tip_distribution_pda, _tip_distribution_bump) =
+            derive_tip_distribution_account_address(&self.program_id, &vote_account, epoch);
+        let (claim_status_pda, claim_status_bump) =
+            derive_claim_status_account_address(&self.program_id, &claimant, &tip_distribution_pda);
+
+        let proof = vec![];
+
+        let ix = Instruction {
+            program_id: self.program_id,
+            data: jito_tip_distribution_legacy::instruction::Claim {
+                bump: claim_status_bump,
+                amount,
+                proof,
+            }
+            .data(),
+            accounts: jito_tip_distribution_legacy::accounts::Claim {
+                config: self.config_pda,
+                tip_distribution_account: tip_distribution_pda,
+                merkle_root_upload_authority: self.keypair.pubkey(),
+                claim_status: claim_status_pda,
+                claimant,
+                payer: self.keypair.pubkey(),
+                system_program: system_program::ID,
+            }
+            .to_account_metas(None),
+        };
+
+        let blockhash = self.client.get_latest_blockhash()?;
+        let tx = Transaction::new_signed_with_payer(
+            &[ix],
+            Some(&self.keypair.pubkey()),
+            &[self.keypair.clone()],
+            blockhash,
+        );
+
+        self.client.send_transaction(&tx)?;
+
+        Ok(())
+    }
+
+    pub fn get_claim_status(
+        &self,
+        vote_account: String,
+        epoch: u64,
+        claimant: String,
+    ) -> anyhow::Result<()> {
+        let vote_pubkey = Pubkey::from_str(&vote_account)?;
+        let claimant_pubkey = Pubkey::from_str(&claimant)?;
+
+        // First get the tip distribution account address
+        let (tip_dist_pda, _) =
+            derive_tip_distribution_account_address(&self.program_id, &vote_pubkey, epoch);
+
+        // Then derive claim status PDA using same seeds as in the program
+        let (claim_status_pda, _) = Pubkey::find_program_address(
+            &[
+                ClaimStatus::SEED,
+                claimant_pubkey.as_ref(),
+                tip_dist_pda.as_ref(),
+            ],
+            &self.program_id,
+        );
+        println!("Claim Status Account Address: {}", claim_status_pda);
+
+        let account_data = self.client.get_account(&claim_status_pda)?.data;
+        let claim_status: ClaimStatus = ClaimStatus::try_deserialize(&mut account_data.as_slice())?;
+
+        println!("Claim Status Data:");
+        println!("  Is Claimed: {}", claim_status.is_claimed);
+        println!("  Claimant: {}", claim_status.claimant);
+        println!("  Claim Status Payer: {}", claim_status.claim_status_payer);
+        println!("  Slot Claimed At: {}", claim_status.slot_claimed_at);
+        println!("  Amount: {}", claim_status.amount);
+        println!("  Expires At: {}", claim_status.expires_at);
+        println!("  Bump: {}", claim_status.bump);
+
+        Ok(())
+    }
+
+    pub fn close_claim_status(
+        &self,
+        vote_account: Pubkey,
+        epoch: u64,
+        claimant: Pubkey,
+    ) -> anyhow::Result<()> {
+        let (tip_distribution_pda, _tip_distribution_bump) =
+            derive_tip_distribution_account_address(&self.program_id, &vote_account, epoch);
+        let (claim_status_pda, _claim_status_bump) =
+            derive_claim_status_account_address(&self.program_id, &claimant, &tip_distribution_pda);
+
+        let ix = Instruction {
+            program_id: self.program_id,
+            data: jito_tip_distribution_legacy::instruction::CloseClaimStatus.data(),
+            accounts: jito_tip_distribution_legacy::accounts::CloseClaimStatus {
+                config: self.config_pda,
+                claim_status: claim_status_pda,
+                claim_status_payer: self.keypair.pubkey(),
             }
             .to_account_metas(None),
         };
