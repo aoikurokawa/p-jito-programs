@@ -5,8 +5,7 @@ use jito_tip_core::{
     transmutable::Transmutable,
 };
 use jito_tip_distribution_core::{
-    config::Config, load_mut_unchecked, load_unchecked,
-    tip_distribution_account::TipDistributionAccount,
+    config::Config, load_unchecked, tip_distribution_account::TipDistributionAccount,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{
@@ -17,7 +16,7 @@ use pinocchio::{
     sysvars::{clock::Clock, rent::Rent, Sysvar},
 };
 use pinocchio_log::log;
-use vote_state::VoteState;
+// use vote_state::VoteState;
 
 /// Initialize a new [TipDistributionAccount] associated with the given validator vote key
 /// and current epoch.

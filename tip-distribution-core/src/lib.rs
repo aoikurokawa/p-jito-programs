@@ -1,6 +1,7 @@
 #![no_std]
 
 use jito_tip_core::transmutable::Transmutable;
+use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::program_error::ProgramError;
 
 pub mod claim_status;
@@ -26,7 +27,11 @@ pub mod tip_distribution_account;
 pub unsafe fn load_mut_unchecked<T: Transmutable>(
     bytes: &mut [u8],
 ) -> Result<&mut T, ProgramError> {
-    if bytes.len() != T::LEN - 8 {
+    if bytes.len()
+        != T::LEN
+            .checked_sub(8)
+            .ok_or(TipDistributionError::ArithmeticError)?
+    {
         return Err(ProgramError::InvalidAccountData);
     }
 
