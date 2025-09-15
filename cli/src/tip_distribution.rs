@@ -156,15 +156,19 @@ pub enum MerkleRootUploadConfigActions {
 pub enum ClaimStatusActions {
     /// Claim
     Claim {
+        /// Validator vote account pubkey
         #[arg(long)]
         vote_account: Pubkey,
 
+        /// Epoch number
         #[arg(long)]
         epoch: u64,
 
+        /// Claimant pubkey
         #[arg(long)]
         claimant: Pubkey,
 
+        /// Amount
         #[arg(long)]
         amount: u64,
     },
@@ -186,12 +190,15 @@ pub enum ClaimStatusActions {
 
     /// Close claim status
     CloseClaimStatus {
+        /// Validator vote account pubkey
         #[arg(long)]
         vote_account: Pubkey,
 
+        /// Epoch number
         #[arg(long)]
         epoch: u64,
 
+        /// Claimant pubkey
         #[arg(long)]
         claimant: Pubkey,
     },
