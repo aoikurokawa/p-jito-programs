@@ -9,6 +9,7 @@ crate-type = ["lib", "cdylib"]
 name = "jito_tip_distribution_program"
 
 [dependencies]
+borsh = { workspace = true }
 jito-tip-core = { workspace = true }
 jito-tip-distribution-core = { workspace = true }
 jito-tip-distribution-sdk = { workspace = true }

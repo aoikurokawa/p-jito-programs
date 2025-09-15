@@ -1,3 +1,4 @@
+use borsh::{BorshDeserialize, BorshSerialize};
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{
     account_info::AccountInfo,
@@ -11,8 +12,7 @@ use pinocchio_system::instructions::Transfer;
 use crate::{merkle_root::MerkleRoot, Transmutable};
 
 /// The account that validators register as **tip_receiver** with the tip-payment program.
-#[derive(Debug, Default)]
-#[repr(C)]
+#[derive(Debug, Default, BorshSerialize, BorshDeserialize)]
 pub struct TipDistributionAccount {
     /// The validator's vote account, also the recipient of remaining lamports after
     /// upon closing this account.
@@ -39,12 +39,12 @@ pub struct TipDistributionAccount {
 
 unsafe impl Transmutable for TipDistributionAccount {
     // header, fields, and InitBumps
-    const LEN: usize = core::mem::size_of::<Self>();
+    // const LEN: usize = 8 + core::mem::size_of::<Self>();
+    const LEN: usize = 168;
 }
 
 impl TipDistributionAccount {
     pub const SEED: &'static [u8] = b"TIP_DISTRIBUTION_ACCOUNT";
-    pub const SIZE: usize = 8 + size_of::<Self>();
     pub const DISCRIMINATOR: &'static [u8] = &[85, 64, 113, 198, 234, 94, 120, 123];
 
     #[inline(always)]

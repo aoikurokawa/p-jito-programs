@@ -26,7 +26,7 @@ pub mod tip_distribution_account;
 pub unsafe fn load_mut_unchecked<T: Transmutable>(
     bytes: &mut [u8],
 ) -> Result<&mut T, ProgramError> {
-    if bytes.len() != T::LEN {
+    if bytes.len() != T::LEN - 8 {
         return Err(ProgramError::InvalidAccountData);
     }
 
