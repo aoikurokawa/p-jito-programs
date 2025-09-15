@@ -1,6 +1,9 @@
 use std::{str::FromStr, sync::Arc};
 
-use anchor_lang::{AccountDeserialize, InstructionData, ToAccountMetas};
+use anchor_lang::{AccountDeserialize, Discriminator, InstructionData, ToAccountMetas};
+use anyhow::anyhow;
+use base64::{engine::general_purpose, Engine};
+use jito_tip_distribution_core::load_unchecked;
 use jito_tip_distribution_legacy::state::{
     ClaimStatus, Config, MerkleRootUploadConfig, TipDistributionAccount,
 };
@@ -8,7 +11,12 @@ use jito_tip_distribution_sdk_legacy::{
     derive_tip_distribution_account_address,
     instruction::{update_config_ix, UpdateConfigAccounts, UpdateConfigArgs},
 };
-use solana_client::rpc_client::RpcClient;
+use solana_account_decoder::{UiAccountEncoding, UiDataSliceConfig};
+use solana_client::{
+    rpc_client::RpcClient,
+    rpc_config::{RpcAccountInfoConfig, RpcProgramAccountsConfig},
+    rpc_filter::{Memcmp, MemcmpEncodedBytes, RpcFilterType},
+};
 use solana_instruction::Instruction;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
@@ -140,6 +148,9 @@ impl TipDistributionCliHandler {
                         epoch,
                     },
             } => self.get_tip_distribution_account(vote_account, epoch),
+            TipDistributionCommands::TipDistributionAccount {
+                action: TipDistributionAccountActions::List,
+            } => self.list_tip_distribution_accounts(),
             TipDistributionCommands::TipDistributionAccount {
                 action:
                     TipDistributionAccountActions::Close {
@@ -439,6 +450,88 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    pub fn list_tip_distribution_accounts(&self) -> anyhow::Result<()> {
+        // let data_size = std::mem::size_of::<TipDistributionAccount>()
+        //     .checked_add(8)
+        //     .ok_or_else(|| anyhow!("Failed to add"))?;
+
+        let data_size = TipDistributionAccount::SIZE
+            .checked_add(8)
+            .ok_or_else(|| anyhow!("Failed to add"))?;
+        let encoded_discriminator =
+            general_purpose::STANDARD.encode(TipDistributionAccount::DISCRIMINATOR);
+        let discriminator_filter = RpcFilterType::Memcmp(Memcmp::new(
+            0,
+            MemcmpEncodedBytes::Base64(encoded_discriminator),
+        ));
+
+        let filters = vec![
+            RpcFilterType::DataSize(data_size as u64),
+            discriminator_filter,
+        ];
+
+        let config = RpcProgramAccountsConfig {
+            filters: Some(filters),
+            account_config: RpcAccountInfoConfig {
+                encoding: Some(UiAccountEncoding::Base64),
+                data_slice: Some(UiDataSliceConfig {
+                    offset: 0,
+                    length: data_size,
+                }),
+                commitment: None,
+                min_context_slot: None,
+            },
+            with_context: Some(false),
+            sort_results: Some(false),
+        };
+
+        let accounts = self
+            .client
+            .get_program_accounts_with_config(&self.program_id, config)?;
+
+        for (_pubkey, account) in accounts {
+            // let tip_dist: TipDistributionAccount =
+            //     TipDistributionAccount::try_deserialize(&mut account.data.as_slice())?;
+
+            let tip_dist = unsafe {
+                load_unchecked::<
+                    jito_tip_distribution_core::tip_distribution_account::TipDistributionAccount,
+                >(&account.data[8..])
+                .unwrap()
+            };
+
+            println!("Tip Distribution Account Data:");
+            // println!("  Vote Account: {}", tip_dist.validator_vote_account);
+            // println!(
+            //     "  Merkle Root Upload Authority: {}",
+            //     tip_dist.merkle_root_upload_authority
+            // );
+            println!("  Epoch Created At: {}", tip_dist.epoch_created_at);
+            println!(
+                "  Validator Commission BPS: {}",
+                tip_dist.validator_commission_bps
+            );
+            println!("  Expires At: {}", tip_dist.expires_at);
+            println!("  Bump: {}", tip_dist.bump);
+
+            if let Some(merkle_root) = tip_dist.merkle_root {
+                println!("  Merkle Root:");
+                println!("    Root: {:?}", merkle_root.root);
+                println!("    Max Total Claim: {}", merkle_root.max_total_claim);
+                println!("    Max Num Nodes: {}", merkle_root.max_num_nodes);
+                println!(
+                    "    Total Funds Claimed: {}",
+                    merkle_root.total_funds_claimed
+                );
+                println!("    Num Nodes Claimed: {}", merkle_root.num_nodes_claimed);
+            } else {
+                println!("  Merkle Root: None");
+            }
+        }
+
+        Ok(())
+    }
+
     /// Close TipDistributionAccount account
     pub fn close_tip_distribution_account(
         &self,
@@ -477,6 +570,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Initialize Merkle Root Upload Config
     pub fn initialize_merkle_root_upload_config(&self) -> anyhow::Result<()> {
         let (merkle_root_upload_upload_config_pda, _merkle_root_upload_upload_config_bump) =
             derive_merkle_root_upload_config_account_address(&self.program_id);
@@ -511,6 +605,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Update merkle root upload config
     pub fn update_merkle_root_upload_config(&self) -> anyhow::Result<()> {
         let (merkle_root_upload_config_pda, _merkle_root_upload_config_bump) =
             derive_merkle_root_upload_config_account_address(&self.program_id);
@@ -544,6 +639,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Migrate merkle root upload config authority
     pub fn migrate_merkle_root_upload_config_authority(
         &self,
         vote_account: Pubkey,
@@ -578,6 +674,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Claim
     pub fn claim(
         &self,
         vote_account: Pubkey,
@@ -625,6 +722,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Get claim status
     pub fn get_claim_status(
         &self,
         vote_account: String,
@@ -664,6 +762,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Close claim status
     pub fn close_claim_status(
         &self,
         vote_account: Pubkey,

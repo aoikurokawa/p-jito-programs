@@ -38,3 +38,12 @@ cargo r --bin jito-tip-cli -- tip-distribution \
     --keypair-path ~/.config/solana/id.json
 ```
 
+### List
+
+```bash
+cargo r --bin jito-tip-cli -- tip-distribution \
+    tip-distribution-account \
+    list \
+    --keypair-path ~/.config/solana/id.json
+```
+
