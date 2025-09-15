@@ -2236,6 +2236,7 @@ dependencies = [
 name = "jito-tip-distribution-core"
 version = "0.0.1"
 dependencies = [
+ "borsh 1.5.7",
  "jito-tip-core",
  "jito-tip-distribution-sdk 0.0.1",
  "pinocchio 0.9.0",
@@ -2247,6 +2248,7 @@ dependencies = [
 name = "jito-tip-distribution-program"
 version = "0.0.1"
 dependencies = [
+ "borsh 1.5.7",
  "jito-tip-core",
  "jito-tip-distribution-core",
  "jito-tip-distribution-sdk 0.0.1",

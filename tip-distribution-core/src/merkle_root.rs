@@ -1,5 +1,6 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
+use borsh::{BorshDeserialize, BorshSerialize};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, BorshSerialize, BorshDeserialize)]
 pub struct MerkleRoot {
     /// The 256-bit merkle root.
     pub root: [u8; 32],

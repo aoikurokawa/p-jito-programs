@@ -1,11 +1,11 @@
+use borsh::BorshSerialize;
 use jito_tip_core::{
     create_account,
     loader::{load_signer, load_system_program},
     transmutable::Transmutable,
 };
 use jito_tip_distribution_core::{
-    config::Config, load_mut_unchecked, load_unchecked,
-    tip_distribution_account::TipDistributionAccount,
+    config::Config, load_unchecked, tip_distribution_account::TipDistributionAccount,
 };
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::{
@@ -16,7 +16,7 @@ use pinocchio::{
     sysvars::{clock::Clock, rent::Rent, Sysvar},
 };
 use pinocchio_log::log;
-use vote_state::VoteState;
+// use vote_state::VoteState;
 
 /// Initialize a new [TipDistributionAccount] associated with the given validator vote key
 /// and current epoch.
@@ -50,18 +50,19 @@ pub fn process_initialize_tip_distribution_account(
         return Err(TipDistributionError::MaxValidatorCommissionFeeBpsExceeded.into());
     }
 
-    unsafe {
-        let validator_vote_state = VoteState::deserialize(validator_vote_account_info)?;
-        if validator_vote_state.node_pubkey.ne(signer_info.key()) {
-            return Err(TipDistributionError::Unauthorized.into());
-        }
-    }
+    // unsafe {
+    //     let validator_vote_state = VoteState::deserialize(validator_vote_account_info)?;
+    //     if validator_vote_state.node_pubkey.ne(signer_info.key()) {
+    //         return Err(TipDistributionError::Unauthorized.into());
+    //     }
+    // }
 
     let current_epoch = Clock::get()?.epoch;
     let rent = Rent::get()?;
-    let space = 8usize
-        .checked_add(TipDistributionAccount::LEN)
-        .ok_or(TipDistributionError::ArithmeticError)?;
+    // let space = 8usize
+    //     .checked_add(TipDistributionAccount::LEN)
+    //     .ok_or(TipDistributionError::ArithmeticError)?;
+    let space = TipDistributionAccount::LEN;
 
     let (tip_distribution_account_pubkey, tip_distribution_account_bump) =
         TipDistributionAccount::find_program_address(
@@ -102,17 +103,20 @@ pub fn process_initialize_tip_distribution_account(
         let tip_distribution_account_data =
             tip_distribution_account_info.borrow_mut_data_unchecked();
         tip_distribution_account_data[0..8].copy_from_slice(TipDistributionAccount::DISCRIMINATOR);
-        load_mut_unchecked::<TipDistributionAccount>(&mut tip_distribution_account_data[8..])?
-    };
 
-    *tip_distribution_account = TipDistributionAccount::new(
-        *validator_vote_account_info.key(),
-        current_epoch,
-        validator_commission_bps,
-        merkle_root_upload_authority,
-        bump,
-        cfg.num_epochs_valid,
-    )?;
+        let account = TipDistributionAccount::new(
+            *validator_vote_account_info.key(),
+            current_epoch,
+            validator_commission_bps,
+            merkle_root_upload_authority,
+            bump,
+            cfg.num_epochs_valid,
+        )?;
+        let mut writer = &mut tip_distribution_account_data[8..];
+        account.serialize(&mut writer).unwrap();
+
+        account
+    };
 
     tip_distribution_account.validate()?;
 
