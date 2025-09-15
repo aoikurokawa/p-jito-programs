@@ -477,6 +477,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Initialize Merkle Root Upload Config
     pub fn initialize_merkle_root_upload_config(&self) -> anyhow::Result<()> {
         let (merkle_root_upload_upload_config_pda, _merkle_root_upload_upload_config_bump) =
             derive_merkle_root_upload_config_account_address(&self.program_id);
@@ -511,6 +512,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Update merkle root upload config
     pub fn update_merkle_root_upload_config(&self) -> anyhow::Result<()> {
         let (merkle_root_upload_config_pda, _merkle_root_upload_config_bump) =
             derive_merkle_root_upload_config_account_address(&self.program_id);
@@ -544,6 +546,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Migrate merkle root upload config authority
     pub fn migrate_merkle_root_upload_config_authority(
         &self,
         vote_account: Pubkey,
@@ -578,6 +581,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Claim
     pub fn claim(
         &self,
         vote_account: Pubkey,
@@ -625,6 +629,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Get claim status
     pub fn get_claim_status(
         &self,
         vote_account: String,
@@ -664,6 +669,7 @@ impl TipDistributionCliHandler {
         Ok(())
     }
 
+    /// Close claim status
     pub fn close_claim_status(
         &self,
         vote_account: Pubkey,
