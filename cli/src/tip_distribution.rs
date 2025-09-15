@@ -107,6 +107,9 @@ pub enum TipDistributionAccountActions {
         max_num_nodes: u64,
     },
 
+    /// List TipDistributionAccounts
+    List,
+
     /// Get the TipDistributionAccount
     Get {
         /// Validator vote account pubkey

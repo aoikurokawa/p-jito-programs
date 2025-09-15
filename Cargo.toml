@@ -20,6 +20,7 @@ readme = "README.md"
 [workspace.dependencies]
 anchor-lang = { version = "0.31.0", features = ["idl-build"] }
 anyhow = "1.0.98"
+base64 = "0.22.1"
 borsh = "1.5.5"
 clap = { version = "=4.0", features = ["derive"] }
 env_logger = "0.11.8"
@@ -45,6 +46,7 @@ serde_with = "3.14.0"
 shank = { version = "0.4.3-alpha.1", features = ["pinocchio"] }
 shank_idl = "0.4.3"
 solana-account = "2.2.0"
+solana-account-decoder = "2.2.0"
 solana-account-info = "2.2.0"
 solana-client = "2.2.0"
 solana-cpi = "2.2.0"
