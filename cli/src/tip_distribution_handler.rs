@@ -419,14 +419,6 @@ impl TipDistributionCliHandler {
         let tip_dist: TipDistributionAccount =
             TipDistributionAccount::try_deserialize(&mut account_data.as_slice())?;
 
-        println!("Account len: {}", account_data.len());
-        // let tip_dist = unsafe {
-        //     load_unchecked::<
-        //         jito_tip_distribution_core::tip_distribution_account::TipDistributionAccount,
-        //     >(&account_data)
-        //     .unwrap()
-        // };
-
         println!("Tip Distribution Account Data:");
         println!("  Vote Account: {}", tip_dist.validator_vote_account);
         println!(

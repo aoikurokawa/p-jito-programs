@@ -116,18 +116,7 @@ pub fn process_initialize_tip_distribution_account(
         account.serialize(&mut writer).unwrap();
 
         account
-        // load_mut_unchecked::<TipDistributionAccount>(&mut tip_distribution_account_data[8..])?
     };
-
-    // let account = TipDistributionAccount::new(
-    //     *validator_vote_account_info.key(),
-    //     current_epoch,
-    //     validator_commission_bps,
-    //     merkle_root_upload_authority,
-    //     bump,
-    //     cfg.num_epochs_valid,
-    // )?;
-    // account.serialize(&mut tip_distribution_account_info[8..]);
 
     tip_distribution_account.validate()?;
 
