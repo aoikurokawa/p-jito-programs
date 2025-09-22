@@ -113,7 +113,9 @@ pub fn process_initialize_tip_distribution_account(
             cfg.num_epochs_valid,
         )?;
         let mut writer = &mut tip_distribution_account_data[8..];
-        account.serialize(&mut writer).unwrap();
+        account
+            .serialize(&mut writer)
+            .map_err(|_e| ProgramError::BorshIoError)?;
 
         account
     };
