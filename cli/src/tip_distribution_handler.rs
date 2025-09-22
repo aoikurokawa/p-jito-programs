@@ -371,7 +371,8 @@ impl TipDistributionCliHandler {
         let mut source: [u8; 32] = [0; 32];
         source.copy_from_slice(&root_bytes);
 
-        let epoch = self.client.get_epoch_info()?.epoch;
+        //let epoch = self.client.get_epoch_info()?.epoch;
+        let epoch = 944;
         let (tip_distribution_pubkey, _tip_distribution_bump) =
             derive_tip_distribution_account_address(&self.program_id, &vote_account, epoch);
 

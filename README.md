@@ -30,7 +30,7 @@ solana program deploy ./target/sbpf-solana-solana/release/jito_tip_distribution_
 | `InitializeTipDistributionAccount`    | 8395                 | 11090              |
 | `InitializeMerkleRootUploadConfig`    | 11531                |                    |
 | `UpdateConfig`                        |                      |                    |
-| `UploadMerkleRoot`                    |                      | 4170               |
+| `UploadMerkleRoot`                    | 5727                 | 4170               |
 | `CloseClaimStatus`                    |                      | 4894               |
 | `CloseTipDistributionAccount`         |                      | 6207               |
 | `Claim`                               |                      | 23936              |

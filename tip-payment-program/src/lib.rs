@@ -39,7 +39,8 @@ pub const TIP_ACCOUNT_SEED_5: &[u8] = b"TIP_ACCOUNT_5";
 pub const TIP_ACCOUNT_SEED_6: &[u8] = b"TIP_ACCOUNT_6";
 pub const TIP_ACCOUNT_SEED_7: &[u8] = b"TIP_ACCOUNT_7";
 
-fn process_instruction(
+#[inline(always)]
+pub fn process_instruction(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
     instruction_data: &[u8],

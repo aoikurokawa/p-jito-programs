@@ -1,7 +1,3 @@
-use helpers::lite_svm_with_programs;
-
-mod helpers;
-
 #[cfg(test)]
 mod tests {
     use jito_tip_payment_program::{
@@ -10,20 +6,43 @@ mod tests {
         TIP_ACCOUNT_SEED_7,
     };
     use jito_tip_payment_sdk::sdk::{change_tip_receiver, initialize_config};
+    use solana_commitment_config::CommitmentLevel;
     use solana_keypair::Keypair;
-    use solana_pubkey::{pubkey, Pubkey};
+    use solana_native_token::sol_to_lamports;
+    use solana_program_test::ProgramTest;
+    use solana_pubkey::Pubkey;
     use solana_signer::Signer;
+    use solana_system_interface::instruction::transfer;
     use solana_transaction::Transaction;
 
-    use super::*;
+    #[tokio::test]
+    async fn change_tip_receiver_success() {
+        let program_id = Pubkey::new_from_array(jito_tip_payment_program::id());
 
-    #[test_log::test]
-    fn change_tip_receiver_success() {
+        let context = ProgramTest::new("jito_tip_payment_program", program_id, None)
+            .start_with_context()
+            .await;
+
         let user_kp = Keypair::new();
-        let mut svm = lite_svm_with_programs();
-        svm.airdrop(&user_kp.pubkey(), 100_000_000).unwrap();
 
-        let program_id = pubkey!("T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqf");
+        let blockhash = context.banks_client.get_latest_blockhash().await.unwrap();
+        context
+            .banks_client
+            .process_transaction_with_preflight_and_commitment(
+                Transaction::new_signed_with_payer(
+                    &[transfer(
+                        &context.payer.pubkey(),
+                        &user_kp.pubkey(),
+                        sol_to_lamports(1f64),
+                    )],
+                    Some(&context.payer.pubkey()),
+                    &[&context.payer],
+                    blockhash,
+                ),
+                CommitmentLevel::Processed,
+            )
+            .await
+            .unwrap();
 
         let (config_pubkey, _) = Pubkey::find_program_address(&[CONFIG_ACCOUNT_SEED], &program_id);
         let (tip_payment_0_pubkey, _) =
@@ -61,10 +80,14 @@ mod tests {
             &[ix],
             Some(&user_kp.pubkey()),
             &[&user_kp],
-            svm.latest_blockhash(),
+            blockhash,
         );
 
-        let _tx_resp = svm.send_transaction(transaction).unwrap();
+        let _tx_resp = context
+            .banks_client
+            .send_transaction(transaction)
+            .await
+            .unwrap();
 
         let old_tip_receiver = Keypair::new();
         let new_tip_receiver = Keypair::new();
@@ -91,9 +114,13 @@ mod tests {
             &[ix],
             Some(&user_kp.pubkey()),
             &[&user_kp],
-            svm.latest_blockhash(),
+            blockhash,
         );
 
-        let _tx_resp = svm.send_transaction(transaction).unwrap();
+        let _tx_resp = context
+            .banks_client
+            .send_transaction(transaction)
+            .await
+            .unwrap();
     }
 }

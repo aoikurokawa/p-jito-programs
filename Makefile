@@ -45,9 +45,8 @@ build-sbf:
 	$(CARGO_SBF)
 
 # Run tests
-.PHONY: test
 test:
-	$(CARGO_NEXTEST) run --all-features
+	SBF_OUT_DIR=$(pwd)/target/sbpf-solana-solana/release cargo nextest run --all-features
 
 # Format code
 .PHONY: format

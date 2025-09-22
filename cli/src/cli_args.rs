@@ -31,7 +31,7 @@ pub struct Cli {
         long,
         global = true,
         default_value = "3vgVYgJxqFKF2cFYHV4GPBUnLynCJYmKizq9DRmZmTUf",
-        help = "Restaking program ID"
+        help = "Tip Distribution Program ID"
     )]
     pub tip_distribution_program_id: String,
 
