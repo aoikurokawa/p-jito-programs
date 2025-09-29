@@ -22,7 +22,7 @@ pub fn process_claim(
     accounts: &[AccountInfo],
     bump: u8,
     amount: u64,
-    proof: [[u8; 32]; 32],
+    proof: Vec<[u8; 32]>,
 ) -> Result<(), ProgramError> {
     let [config_info, tip_distribution_account_info, merkle_root_upload_authority_info, claim_status_info, claimant_info, payer_info, system_program_info, validator_vote_account_info] =
         accounts
