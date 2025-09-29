@@ -1,5 +1,3 @@
-#![no_std]
-
 use change_block_builder::process_change_block_builder;
 use change_tip_receiver::process_change_tip_receiver;
 use initialize::process_initialize;
