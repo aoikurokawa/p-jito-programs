@@ -41,23 +41,6 @@ mod tests {
             .unwrap();
 
         let (config_pubkey, _) = Config::find_program_address(&program_id.to_bytes());
-        // let (config_pubkey, _) = Pubkey::find_program_address(&[CONFIG_ACCOUNT_SEED], &program_id);
-        // let (tip_payment_0_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_0], &program_id);
-        // let (tip_payment_1_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_1], &program_id);
-        // let (tip_payment_2_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_2], &program_id);
-        // let (tip_payment_3_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_3], &program_id);
-        // let (tip_payment_4_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_4], &program_id);
-        // let (tip_payment_5_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_5], &program_id);
-        // let (tip_payment_6_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_6], &program_id);
-        // let (tip_payment_7_pubkey, _) =
-        //     Pubkey::find_program_address(&[TIP_ACCOUNT_SEED_7], &program_id);
 
         let ix = initialize_config(
             &program_id,

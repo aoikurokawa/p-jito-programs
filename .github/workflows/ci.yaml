@@ -94,6 +94,14 @@ jobs:
           name: jito_tip_payment_program.so
           path: target/deploy/jito_tip_payment_program.so
 
+      - run: solana-verify build --library-name jito_tip_distribution_program --base-image solanafoundation/solana-verifiable-build:2.2.14
+
+      - name: Upload jito_tip_distribution_program.so
+        uses: actions/upload-artifact@v4
+        with:
+          name: jito_tip_distribution_program.so
+          path: target/deploy/jito_tip_distribution_program.so
+
   test_sbf:
     name: cargo test
     runs-on: ubuntu-latest
@@ -112,6 +120,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jito_tip_payment_program.so
+          path: target/sbpf-solana-solana/release/
+      - name: Download jito tip distribution program
+        uses: actions/download-artifact@v4
+        with:
+          name: jito_tip_distribution_program.so
           path: target/sbpf-solana-solana/release/
       - uses: taiki-e/install-action@v2
         with:
