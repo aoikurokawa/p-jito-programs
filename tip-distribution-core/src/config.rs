@@ -80,6 +80,11 @@ impl Config {
         Ok(())
     }
 
+    /// Returns the seeds for the PDA
+    pub fn seeds() -> Vec<Vec<u8>> {
+        vec![b"CONFIG_ACCOUNT".to_vec()]
+    }
+
     /// Find the program address for the global configuration account
     ///
     /// # Arguments
@@ -89,12 +94,11 @@ impl Config {
     /// * `u8` - The bump seed
     /// * `Vec<Vec<u8>>` - The seeds used to generate the PDA
     #[inline(always)]
-    pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8) {
-        // let seeds = Self::seeds();
-        // let seeds_iter: Vec<_> = seeds.iter().map(|s| s.as_slice()).collect();
-        let seeds = [Self::SEED];
-        let (pda, bump) = find_program_address(&seeds, program_id);
-        (pda, bump)
+    pub fn find_program_address(program_id: &Pubkey) -> (Pubkey, u8, Vec<Vec<u8>>) {
+        let seeds = Self::seeds();
+        let seeds_iter: Vec<&[u8]> = seeds.iter().map(|s| s.as_slice()).collect();
+        let (pda, bump) = find_program_address(&seeds_iter, program_id);
+        (pda, bump, seeds)
     }
 
     /// Attempts to load the account as [`Config`], returning an error if it's not valid.

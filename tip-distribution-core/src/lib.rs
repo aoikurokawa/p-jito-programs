@@ -1,5 +1,3 @@
-#![no_std]
-
 use jito_tip_core::transmutable::Transmutable;
 use jito_tip_distribution_sdk::error::TipDistributionError;
 use pinocchio::program_error::ProgramError;

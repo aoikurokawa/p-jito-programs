@@ -36,22 +36,18 @@ pub fn process_initialize(
         .checked_add(Config::LEN)
         .ok_or(TipDistributionError::ArithmeticError)?;
 
-    let (config_pubkey, config_bump) = Config::find_program_address(program_id);
-
+    let (config_pubkey, config_bump, mut config_seeds) = Config::find_program_address(program_id);
+    config_seeds.push(vec![config_bump]);
     if config_pubkey.ne(config_info.key()) {
         log!("Config account is not at the correct PDA");
         return Err(ProgramError::InvalidAccountData);
     }
 
-    let config_slice = [config_bump];
-
-    // Create the seeds for the PDA
-    let config_seeds = [
-        Seed::from(b"CONFIG_ACCOUNT".as_slice()),
-        Seed::from(config_slice.as_slice()),
-    ];
-
-    let signers = [Signer::from(config_seeds.as_slice())];
+    let seeds: Vec<Seed> = config_seeds
+        .iter()
+        .map(|seed| Seed::from(seed.as_slice()))
+        .collect();
+    let signers = [Signer::from(seeds.as_slice())];
 
     log!("Initializing Config at address {}", config_info.key());
     create_account(

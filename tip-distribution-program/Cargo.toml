@@ -20,5 +20,16 @@ pinocchio-system = { workspace = true }
 solana-program = { workspace = true }
 vote-state = { workspace = true }
 
+[dev-dependencies]
+solana-commitment-config = { workspace = true }
+solana-keypair = { workspace = true }
+solana-native-token = { workspace = true }
+solana-program-test = { workspace = true }
+solana-pubkey = { workspace = true }
+solana-signer = { workspace = true }
+solana-system-interface = { workspace = true }
+solana-transaction = { workspace = true }
+tokio = { workspace = true }
+
 [lints]
 workspace = true
