@@ -65,8 +65,6 @@ pub struct TipDistributionCliHandler {
 
     /// Config Bump
     config_bump: u8,
-    // The configuration of CLI
-    // cli_config: CliConfig,
 }
 
 impl TipDistributionCliHandler {
