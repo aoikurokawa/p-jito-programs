@@ -40,13 +40,9 @@ mod tests {
             .await
             .unwrap();
 
-        let (config_pubkey, _) = Config::find_program_address(&program_id.to_bytes());
+        let (config_pubkey, _) = Pubkey::find_program_address(&[Config::SEED], &program_id);
 
-        let ix = initialize_config(
-            &program_id,
-            &Pubkey::new_from_array(config_pubkey),
-            &user_kp.pubkey(),
-        );
+        let ix = initialize_config(&program_id, &config_pubkey, &user_kp.pubkey());
 
         let transaction = Transaction::new_signed_with_payer(
             &[ix],
