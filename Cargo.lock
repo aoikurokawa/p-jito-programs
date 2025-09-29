@@ -2360,7 +2360,16 @@ dependencies = [
  "pinocchio-log",
  "pinocchio-pubkey 0.2.4",
  "pinocchio-system",
+ "solana-commitment-config",
+ "solana-keypair",
+ "solana-native-token",
  "solana-program",
+ "solana-program-test",
+ "solana-pubkey",
+ "solana-signer",
+ "solana-system-interface",
+ "solana-transaction",
+ "tokio",
  "vote-state",
 ]
 
