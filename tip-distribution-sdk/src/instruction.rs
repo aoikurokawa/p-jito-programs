@@ -43,11 +43,12 @@ pub enum JitoTipDistributionInstruction {
     CloseTipDistributionAccount,
 
     // Claim
-    // Claim {
-    //     bump: u8,
-    //     amount: u64,
-    //     proof: [[u8; 32]; MAX_PROOF_SIZE],
-    // },
+    Claim {
+        bump: u8,
+        amount: u64,
+        proof: Vec<[u8; 32]>,
+    },
+
     /// Initialize merkle root upload config
     InitializeMerkleRootUploadConfig {
         authority: Pubkey,
