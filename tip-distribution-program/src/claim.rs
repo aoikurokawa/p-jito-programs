@@ -130,7 +130,7 @@ pub fn process_claim(
             .to_bytes(),
     ]);
 
-    if !verify(&proof, merkle_root.root, node.to_bytes()) {
+    if !verify(proof, merkle_root.root, node.to_bytes()) {
         return Err(TipDistributionError::InvalidProof.into());
     }
 
